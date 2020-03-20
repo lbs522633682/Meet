@@ -1,0 +1,17 @@
+ext {
+    // 配置android下的属性
+    android = [
+            compileSdkVersion: 29,
+            buildToolsVersion: "29.0.2",
+            applicationId    : "plat.skytv.client.meet",
+            minSdkVersion    : 21,
+            targetSdkVersion : 29,
+            versionCode      : 1,
+            versionName      : "1.0"
+    ]
+    // 配置dependencies下的属性
+    dependencies = [
+            "appcompat": 'androidx.appcompat:appcompat:1.1.0'
+    ]
+
+}
