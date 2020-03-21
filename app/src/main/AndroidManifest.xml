@@ -28,11 +28,11 @@
             android:name="notch.config"
             android:value="portrait|landscape" />
 
-        <activity android:name=".ui.GuideActivity" />
+        <activity android:name=".ui.IndexActivity" />
         <activity android:name=".ui.LoginActivity" />
         <activity android:name=".MainActivity" />
         <activity
-            android:name=".ui.IndexActivity"
+            android:name=".ui.GuideActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/AppThemeFull">
 

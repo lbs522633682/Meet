@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import androidx.annotation.RequiresApi;
+
 import com.liboshuai.framework.utils.LogUtils;
 
 import java.io.IOException;
@@ -29,10 +31,11 @@ public class MediaPlayerManager {
     // 停止
     public static final int MEDIA_STATUS_STOP = 2;
 
+    public int MEDIA_STATUS = MEDIA_STATUS_STOP;
+
     private static final int H_PROGRESS_WHAT = 1000;
 
     // 当前状态，默认停止
-    private static int MEDIA_STATUS = MEDIA_STATUS_STOP;
     private MediaPlayer mediaPlayer;
     private OnMusicProgressListener musicProgressListener;
 
@@ -44,7 +47,7 @@ public class MediaPlayerManager {
                 case H_PROGRESS_WHAT:
                     if (musicProgressListener != null) {
                         // 返回当前进度 及 百分比
-                        int p = (int) (((float)getCurrentPosition() / (float) getDuration()) * 100);
+                        int p = (int) (((float) getCurrentPosition() / (float) getDuration()) * 100);
                         musicProgressListener.OnProgress(getCurrentPosition(), p);
                         mHandler.sendEmptyMessageDelayed(H_PROGRESS_WHAT, 1000);
                     }
@@ -69,11 +72,9 @@ public class MediaPlayerManager {
      * @param path
      */
     public void startPlay(AssetFileDescriptor path) {
-        mediaPlayer.reset();
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mediaPlayer.setDataSource(path);
-            }
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(path.getFileDescriptor(), path.getStartOffset(), path.getLength());
             mediaPlayer.prepare();
             mediaPlayer.start();
             MEDIA_STATUS = MEDIA_STATUS_PALY;
@@ -190,6 +191,7 @@ public class MediaPlayerManager {
 
         /**
          * 返回当前进度和百分比
+         *
          * @param currentPosition
          * @param pos
          */

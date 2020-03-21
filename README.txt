@@ -1,4 +1,48 @@
 开发日志 思考每一个遇到的问题
+-----------------------------------20200321---------------------------
+## 完成内容
+    /**
+     * 1.viewpage:适配器 | 帧动画
+     * 2.小圆点的逻辑
+     * 3.歌曲的播放
+     * 4.属性动画的旋转
+     * 5.跳转
+     */
+
+## MediaPlayerManager 播放raw文件
+
+    // 针对7.0及以上
+    setDataSource(@NonNull AssetFileDescriptor afd)
+    // 都可用
+    setDataSource(FileDescriptor fd, long offset, long length)
+
+## ViewPagerAdapter 封装
+
+## ViewPager 预加载
+    没必要一次性将所有item加载出来
+
+    mViewPager.setOffscreenPageLimit(mPageList.size());
+
+## 引导页 帧动画
+### 帧动画播放
+    1.获取view上设置的帧动画
+
+    2.调用start方法即可
+
+### 帧动画设置
+    res/drawable/xxx.xml
+    <animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+        android:oneshot="false">
+
+        <-- oneshot 是否只显示一次，false：永久循环 -->
+
+        <item android:drawable="@drawable/img_guide_smile_1" android:duration="2000"/>
+        <item android:drawable="@drawable/img_guide_smile_2" android:duration="2000"/>
+        <item android:drawable="@drawable/img_guide_smile_3" android:duration="2000"/>
+        <item android:drawable="@drawable/img_guide_smile_4" android:duration="2000"/>
+        ...
+    </animation-list>
+
 -----------------------------------20200320---------------------------
 ## Git忽略某些不重要的文件
 
