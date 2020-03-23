@@ -6,8 +6,6 @@ import android.content.res.AssetFileDescriptor;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -135,6 +133,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
 
     /**
      * 选择小圆点
+     *
      * @param position
      */
     private void selectPosition(int position) {
@@ -162,6 +161,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
      * music
      * 1.正在播放，就暂停
      * 2.暂停，就播放
+     *
      * @param v
      */
     @Override
@@ -179,10 +179,17 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
                 }
                 break;
             case R.id.tv_guide_skip:
-                Intent i = new Intent(this, LoginActivity.class);
+                // TODO Intent i = new Intent(this, LoginActivity.class);
+                Intent i = new Intent(this, TestActivity.class);
                 startActivity(i);
                 finish();
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mediaPlayerManager.stopPlay();
     }
 }

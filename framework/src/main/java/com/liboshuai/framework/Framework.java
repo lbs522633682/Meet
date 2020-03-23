@@ -2,6 +2,7 @@ package com.liboshuai.framework;
 
 import android.content.Context;
 
+import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.utils.SpUtils;
 
 /**
@@ -34,5 +35,6 @@ public class Framework {
      */
     public void initFramework(Context context) {
         SpUtils.getInstance().initSp(context);
+        BmobManager.getInstance().initBmob(context);
     }
 }
