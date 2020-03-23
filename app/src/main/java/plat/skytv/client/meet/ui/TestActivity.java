@@ -79,13 +79,21 @@ public class TestActivity extends Activity implements View.OnClickListener {
                 });
                 break;
             case R.id.btn_update:
-
+                // Tips:更新名字的时候，会将sex一同更新
+                MyData data2 = new MyData();
+                data2.setName("lisi");
+                data2.update("26898be5fd", new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e == null) {
+                            LogUtils.i("update success");
+                        }
+                    }
+                });
                 break;
             case R.id.btn_query:
-
-                // 2.条件查询
+                // 3.全部查询
                 BmobQuery<MyData> categoryBmobQuery = new BmobQuery<>();
-                categoryBmobQuery.addWhereEqualTo("name", "张三");
                 categoryBmobQuery.findObjects(new FindListener<MyData>() {
                     @Override
                     public void done(List<MyData> list, BmobException e) {
@@ -98,6 +106,22 @@ public class TestActivity extends Activity implements View.OnClickListener {
                         }
                     }
                 });
+
+                // 2.条件查询
+                /*BmobQuery<MyData> categoryBmobQuery = new BmobQuery<>();
+                categoryBmobQuery.addWhereEqualTo("name", "张三");
+                categoryBmobQuery.findObjects(new FindListener<MyData>() {
+                    @Override
+                    public void done(List<MyData> list, BmobException e) {
+                        if (e == null) {
+                            if (list != null && list.size() > 0) {
+                                LogUtils.i("findObjects size = " + list.size());
+                            }
+                        } else {
+                            Log.e("BMOB", e.toString());
+                        }
+                    }
+                });*/
                 // 1.根据唯一标识查询
                 /*BmobQuery<MyData> bmobQuery = new BmobQuery<MyData>();
                 bmobQuery.getObject("26898be5fd", new QueryListener<MyData>() {
