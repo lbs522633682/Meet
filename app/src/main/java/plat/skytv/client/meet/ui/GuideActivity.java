@@ -179,8 +179,8 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
                 }
                 break;
             case R.id.tv_guide_skip:
-                // TODO Intent i = new Intent(this, LoginActivity.class);
-                Intent i = new Intent(this, TestActivity.class);
+                Intent i = new Intent(this, LoginActivity.class);
+                // Intent i = new Intent(this, TestActivity.class);
                 startActivity(i);
                 finish();
                 break;

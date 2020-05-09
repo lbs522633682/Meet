@@ -79,14 +79,13 @@ public class TestActivity extends Activity implements View.OnClickListener {
                 });
                 break;
             case R.id.btn_update:
-                // Tips:更新名字的时候，会将sex一同更新
                 MyData data2 = new MyData();
                 data2.setName("lisi");
                 data2.update("26898be5fd", new UpdateListener() {
                     @Override
                     public void done(BmobException e) {
                         if (e == null) {
-                            LogUtils.i("update success");
+
                         }
                     }
                 });
