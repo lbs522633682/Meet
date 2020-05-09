@@ -72,6 +72,18 @@ public class TouchPictureV extends View {
         // 2. 绘制一个空白块
         drawNullCard(canvas);
         // 3. 绘制一个移动的方块
+        drawMoveCard(canvas);
+    }
+
+    /**
+     * 绘制移动方块
+     * @param canvas
+     */
+    private void drawMoveCard(Canvas canvas) {
+        // 1. 对bgBitmap进行裁剪 从（LINE_W， LINE_H）坐标开始截取 宽高为CARD_SIZE的图片
+        Bitmap bitmap = Bitmap.createBitmap(bgBitmap, LINE_W, LINE_H, CARD_SIZE, CARD_SIZE);
+        // 2.绘制到view上
+        canvas.drawBitmap(bitmap, 0, LINE_H, mPaintMove);
     }
 
     /**
