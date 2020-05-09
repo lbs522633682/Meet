@@ -25,5 +25,8 @@
         android:layout_height="wrap_content"
         android:text="查" />
 
+    <com.liboshuai.framework.view.TouchPictureV
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
 
 </LinearLayout>

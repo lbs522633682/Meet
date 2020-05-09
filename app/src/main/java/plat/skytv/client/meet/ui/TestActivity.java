@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.annotation.Nullable;
-
 import com.liboshuai.framework.bmob.MyData;
 import com.liboshuai.framework.utils.LogUtils;
 
@@ -33,7 +31,7 @@ public class TestActivity extends Activity implements View.OnClickListener {
     private Button btn_query;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
         initView();
