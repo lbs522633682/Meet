@@ -7,26 +7,25 @@
     <Button
         android:id="@+id/btn_add"
         android:layout_width="300dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:text="增加" />
+
     <Button
         android:id="@+id/btn_delete"
         android:layout_width="300dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:text="删除" />
+
     <Button
-        android:id="@+id/btn_update"
+        android:id="@+id/btn_modify"
         android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:text="更新" />
+        android:layout_height="50dp"
+        android:text="改" />
+
     <Button
         android:id="@+id/btn_query"
         android:layout_width="300dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:text="查" />
-
-    <com.liboshuai.framework.view.TouchPictureV
-        android:layout_width="match_parent"
-        android:layout_height="300dp" />
 
 </LinearLayout>

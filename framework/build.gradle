@@ -7,7 +7,7 @@ android {
         splits.density.enable = false
         aaptOptions.cruncherEnabled = false
     }
-    //HttpClient
+    // httpclient
     useLibrary rootProject.ext.dependencies["httpclient"]
     compileSdkVersion rootProject.ext.android["compileSdkVersion"]
     buildToolsVersion rootProject.ext.android["buildToolsVersion"]
@@ -22,7 +22,7 @@ android {
     }
 
     buildTypes {
-        debug {
+        debug{
             // 自定义gradle常量
             buildConfigField("boolean", "LOG_DEBUG", "true")
             buildConfigField("String", "LOG_TAG", "\"Meet\"")
@@ -42,9 +42,10 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api rootProject.ext.dependencies["appcompat"]
+    // bmob
     api rootProject.ext.dependencies["bmobsdk"]
-    api rootProject.ext.dependencies["rxjava2"]
-    api rootProject.ext.dependencies["rxandroid2"]
+    api rootProject.ext.dependencies["rxjava"]
+    api rootProject.ext.dependencies["rxandroid"]
     api rootProject.ext.dependencies["okio"]
     api rootProject.ext.dependencies["gson"]
     api rootProject.ext.dependencies["okhttp3"]
