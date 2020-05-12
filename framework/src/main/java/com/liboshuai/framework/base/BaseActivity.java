@@ -1,15 +1,20 @@
 package com.liboshuai.framework.base;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.liboshuai.framework.utils.LogUtils;
+import com.liboshuai.framework.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Author:boshuai.li
@@ -31,7 +36,27 @@ public class BaseActivity extends AppCompatActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
+    // 待申请的权限集合
     private List<String> mPerList = new ArrayList<>();
+    // 没有同意的权限集合
+    private List<String> mNotAllowPerList = new ArrayList<>();
+
+    // 监听权限申请结果
+    private OnPermissionResult permissionResult;
+    // 回调code
+    private int requestCode;
+
+    /**
+     * 封装方法
+     *
+     * @param requestCode
+     * @param permissionResult
+     */
+    protected void request(int requestCode, OnPermissionResult permissionResult) {
+        if (!checkPermissionAll()) {
+            requestPermissionAll(requestCode, permissionResult);
+        }
+    }
 
     /**
      * 检查单个权限
@@ -60,11 +85,12 @@ public class BaseActivity extends AppCompatActivity {
         for (int i = 0; i < PERMISSIONS.length; i++) {
             boolean check = checkPermission(PERMISSIONS[i]);
             if (!check) {
+                LogUtils.i("checkPermissionAll i = " + PERMISSIONS[i]);
                 mPerList.add(PERMISSIONS[i]);
             }
         }
 
-        return mPerList.size() > 0;
+        return mPerList.size() > 0 ? false : true;
     }
 
     /**
@@ -74,6 +100,7 @@ public class BaseActivity extends AppCompatActivity {
      * @param requestCode
      */
     protected void requestPermission(String[] permissions, int requestCode) {
+        LogUtils.i("requestPermission permissions = " + permissions);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(permissions, requestCode);
         }
@@ -81,9 +108,76 @@ public class BaseActivity extends AppCompatActivity {
 
     /**
      * 请求 权限组
+     *
      * @param requestCode
      */
-    protected void requestPermissionAll(int requestCode) {
+    protected void requestPermissionAll(int requestCode, OnPermissionResult permissionResult) {
+        this.permissionResult = permissionResult;
+        this.requestCode = requestCode;
         requestPermission((String[]) mPerList.toArray(new String[mPerList.size()]), requestCode);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        mNotAllowPerList.clear();
+        if (requestCode == this.requestCode) {
+            if (grantResults.length > 0) {
+                for (int i = 0; i < grantResults.length; i++) {
+                    if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                        // 申请失败
+                        mNotAllowPerList.add(permissions[i]);
+                    }
+                }
+
+                if (permissionResult != null) {
+                    if (mNotAllowPerList.size() == 0) {
+                        permissionResult.OnSuccess();
+                    } else {
+                        permissionResult.OnFail(mNotAllowPerList);
+                    }
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    /**
+     * 权限申请回调
+     */
+    protected interface OnPermissionResult {
+        void OnSuccess();
+
+        /**
+         * 将未允许的 权限回调出去
+         *
+         * @param mNotAllowPerList
+         */
+        void OnFail(List<String> mNotAllowPerList);
+    }
+
+
+    /**
+     * 检查是否拥有 窗口权限
+     * 该应用是否可显示在其他应用之上
+     *
+     * @return
+     */
+    protected boolean checkWindowPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return Settings.canDrawOverlays(this);
+        }
+
+        return true;
+    }
+
+    /**
+     * 请求窗口权限
+     *
+     * @param requestCode
+     */
+    protected void requestWindowPermissions(int requestCode) {
+        Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+                , Uri.parse("package:" + getPackageName()));
+        startActivityForResult(i, requestCode);
     }
 }

@@ -5,7 +5,10 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.liboshuai.framework.base.BaseUIActivity;
+import com.liboshuai.framework.utils.LogUtils;
 import com.liboshuai.framework.utils.ToastUtil;
+
+import java.util.List;
 
 /**
  * Author:boshuai.li
@@ -15,27 +18,34 @@ import com.liboshuai.framework.utils.ToastUtil;
 public class MainActivity extends BaseUIActivity {
 
     private static final int PERMISSION_REQ_CODE = 1000;
+    private static final int PERMISSION_REQ_WINDOW_CODE = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        checkPermission(Manifest.permission.READ_PHONE_STATE);
-
+        requestPerssions();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == PERMISSION_REQ_CODE) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                ToastUtil.showTextToast(this, "请求成功");
-            } else {
-                ToastUtil.showTextToast(this, "请求失败");
-            }
+    private void requestPerssions() {
+
+         if (!checkWindowPermissions()) {
+            requestWindowPermissions(PERMISSION_REQ_WINDOW_CODE);
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        request(PERMISSION_REQ_CODE, new OnPermissionResult() {
+            @Override
+            public void OnSuccess() {
+                LogUtils.i("requestPerssions OnSuccess");
+            }
+
+            @Override
+            public void OnFail(List<String> mNotAllowPerList) {
+                LogUtils.i("requestPerssions OnFail mNotAllowPerList = " + mNotAllowPerList.toString());
+            }
+        });
     }
+
+
 }
