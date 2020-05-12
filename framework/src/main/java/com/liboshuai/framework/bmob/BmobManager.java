@@ -36,6 +36,7 @@ public class BmobManager {
 
     /**
      * 获取本地已经登录对象
+     *
      * @return
      */
     public IMUser getUser() {
@@ -61,12 +62,22 @@ public class BmobManager {
 
     /**
      * 一键注册或登录:
+     *
      * @param phone
-     * @param code 验证码
+     * @param code     验证码
      * @param listener
      */
     public void signOrLoginByMobilePhone(String phone, String code, LogInListener<IMUser> listener) {
         BmobUser.signOrLoginByMobilePhone(phone, code, listener);
 
+    }
+
+    /**
+     * 判断用户是否登录
+     *
+     * @return
+     */
+    public boolean isLogin() {
+        return BmobUser.isLogin();
     }
 }
