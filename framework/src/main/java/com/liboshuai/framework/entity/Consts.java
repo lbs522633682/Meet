@@ -12,4 +12,7 @@ public class Consts {
 
     // TOKEN
     public static final String SP_TOKEN = "token";
+
+    // 手机号码
+    public static final String SP_PHONE = "k_phone";
 }

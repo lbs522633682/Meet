@@ -1,12 +1,17 @@
 package plat.skytv.client.meet;
 
-import android.content.res.AssetFileDescriptor;
 import android.os.Bundle;
 
 import com.liboshuai.framework.base.BaseUIActivity;
-import com.liboshuai.framework.manager.MediaPlayerManager;
-import com.liboshuai.framework.utils.LogUtils;
+import com.liboshuai.framework.bmob.BmobManager;
+import com.liboshuai.framework.bmob.IMUser;
+import com.liboshuai.framework.utils.ToastUtil;
 
+/**
+ * Author:boshuai.li
+ * Time:2020/3/19   16:14
+ * Description: 主页
+ */
 public class MainActivity extends BaseUIActivity {
 
     @Override
@@ -14,17 +19,10 @@ public class MainActivity extends BaseUIActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final MediaPlayerManager mediaPlayerManager = new MediaPlayerManager();
-        AssetFileDescriptor assetFileDescriptor = getResources().openRawResourceFd(R.raw.guide);
+        IMUser user = BmobManager.getInstance().getUser();
 
-        mediaPlayerManager.setOnProgressListener(new MediaPlayerManager.OnMusicProgressListener() {
-            @Override
-            public void OnProgress(int currentPosition, int poi) {
-                LogUtils.i("currentPosition = " + currentPosition + ", poi = " + poi);
-            }
-        });
+        ToastUtil.showTextToast(this, user.getMobilePhoneNumber());
 
-        mediaPlayerManager.startPlay(assetFileDescriptor);
     }
 
 }

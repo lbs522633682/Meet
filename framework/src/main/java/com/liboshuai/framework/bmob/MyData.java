@@ -1,7 +1,5 @@
 package com.liboshuai.framework.bmob;
 
-import androidx.annotation.NonNull;
-
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.helper.GsonUtil;
 
@@ -32,7 +30,6 @@ public class MyData extends BmobObject {
         this.sex = sex;
     }
 
-    @NonNull
     @Override
     public String toString() {
         return GsonUtil.toJson(this);
