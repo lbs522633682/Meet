@@ -16,9 +16,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.bmob.IMUser;
 import com.liboshuai.framework.entity.Consts;
+import com.liboshuai.framework.manager.DialogManager;
 import com.liboshuai.framework.utils.LogUtils;
 import com.liboshuai.framework.utils.SpUtils;
 import com.liboshuai.framework.utils.ToastUtil;
+import com.liboshuai.framework.view.DialogView;
+import com.liboshuai.framework.view.TouchPictureV;
 
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.LogInListener;
@@ -49,6 +52,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button btn_login;
     private TextView tv_test_login;
     private TextView tv_user_agreement;
+    private DialogView mCodeView;
+    private TouchPictureV mPictureV;
 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -82,6 +87,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void initView() {
+
+        initDialogView();
+
         et_phone = (EditText) findViewById(R.id.et_phone);
         et_code = (EditText) findViewById(R.id.et_code);
         btn_send_code = (Button) findViewById(R.id.btn_send_code);
@@ -99,11 +107,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    private void initDialogView() {
+        mCodeView = DialogManager.getInstance().initView(this, R.layout.dialog_code_view);
+        mPictureV = mCodeView.findViewById(R.id.mPictureV);
+        mPictureV.setViewResultListener(new TouchPictureV.OnViewResultListener() {
+            @Override
+            public void onResult() {
+                // 拖拽成功
+                LogUtils.i("initDialogView onResult enter");
+                DialogManager.getInstance().hide(mCodeView);
+                sendSMS();
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_send_code:
-                sendSMS();
+                DialogManager.getInstance().show(mCodeView);
                 break;
             case R.id.btn_login:
                 login();
