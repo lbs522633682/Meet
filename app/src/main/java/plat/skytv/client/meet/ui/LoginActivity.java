@@ -21,6 +21,7 @@ import com.liboshuai.framework.utils.LogUtils;
 import com.liboshuai.framework.utils.SpUtils;
 import com.liboshuai.framework.utils.ToastUtil;
 import com.liboshuai.framework.view.DialogView;
+import com.liboshuai.framework.view.LoadingView;
 import com.liboshuai.framework.view.TouchPictureV;
 
 import cn.bmob.v3.exception.BmobException;
@@ -54,6 +55,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView tv_user_agreement;
     private DialogView mCodeView;
     private TouchPictureV mPictureV;
+
+    private LoadingView mLoadingView; // 加载loading
 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
@@ -108,6 +111,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void initDialogView() {
+
+        mLoadingView = new LoadingView(this);
+
         mCodeView = DialogManager.getInstance().initView(this, R.layout.dialog_code_view);
         mPictureV = mCodeView.findViewById(R.id.mPictureV);
         mPictureV.setViewResultListener(new TouchPictureV.OnViewResultListener() {
@@ -147,9 +153,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
+        // 展示loading
+
+        mLoadingView.show("正在登陆...");
+
         BmobManager.getInstance().signOrLoginByMobilePhone(phone, code, new LogInListener<IMUser>() {
             @Override
             public void done(IMUser imUser, BmobException e) {
+                mLoadingView.hide();
                 if (e == null) {
                     LogUtils.i("短信注册或登录成功：" + imUser.getUsername());
                     // 保存手机号码
