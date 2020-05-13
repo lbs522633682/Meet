@@ -1,6 +1,55 @@
 开发日志 思考每一个遇到的问题
 -----------------------------------20200513---------------------------
 ## APP启动优化
+### 启动类型
+    1.冷启动 第一次开始  或是 重装启动
+    2.热启动 第二次或之后启动
+    3.温启动 退到后台，由于某些原因被杀死，但整体数据还保存
+
+### Shell命令 检测启动时间
+    1. shell命令
+    adb shell am start -S -W [packageName]/[packageName.MainActivity]
+        1. thisTime 最后一个Act的启动耗时
+        2. TotalTime 启动一连串Act的总耗时
+        3. WaitTime 应用创建时间 + TotalTime
+        4. 应用创建时间 WaitTime - TotalTime
+
+    2. Log打印
+
+        Android 4.4 开始 ActivityManager增加了 Log TAG= displayed
+
+        05-13 10:48:54.758 376-407/? I/ActivityManager: Displayed com.mumu.launcher/.Launcher: +1s494ms
+        05-13 11:02:45.471 376-407/? I/ActivityManager: Displayed plat.skytv.client.education/plat.skytv.client.qh.cm.activity.SplashActivity: +2s606ms
+        05-13 11:02:51.985 376-407/? I/ActivityManager: Displayed plat.skytv.client.education/plat.skytv.main.activity.MainActivity: +346ms
+
+### 启动优化手段 
+    1.视图优化 黑屏白屏  治标不治本
+        1.1 设置主题透明 style中设置 windowIsTranslucent  值为true
+        1.2 设置启动图片  style中 windowBackground 加一张图片  windowDrawSystemBarBackgrounds 为false
+    2.代码优化
+        2.1 优化Application
+
+            --必要的组件在程序主页去初始化，不要在Application中
+
+            --如果一定在Application中初始化，尽可能延时 handler.postdelay
+
+            --必要的组件，子线程中初始化 new Thread().start
+        2.2 不需要繁琐的布局
+        2.3 阻塞UI线程的操作
+        2.4 加载BItmap/ 大图
+        2.5 其他一些占用主线程的操作
+
+#### 冷启动经过的步骤
+    1.第一次安装，加载应用程序并启动
+    2.启动后显示一个空白的窗口
+    3.启动、创建了应用进程
+
+#### APP 内部
+    1. 创建APP 对象、Application对象
+    2. 启动主线程（Main/UI Thread）
+    3. 创建应用入口/ LAUNCHER
+    4. 填充VIewGroup中的View
+    5. 绘制view measure -> layout-> draw
 -----------------------------------20200512---------------------------
 ## 动态权限与窗口权限
 ### 权限分类 普通 危险 特殊
@@ -242,8 +291,8 @@
     https://git.imooc.com/coding-390/Meet
 
 ## 课程中所使用到的第三方平台的Key,只作为参考,建议自行申请
-    Bmob Key：f8efae5debf319071b44339cf51153fc
-    融云 Key：k51hidwqk4yeb
+    Bmob Key：f8efae5debf319071b44339cf51153fc  用户系统
+    融云 Key：k51hidwqk4yeb 音视频
     融云 Secret：os83U32SrAG
     高德地图 Key：abde3c5f58d7dd9a762019906cef613e
     高德地图 Web Key：389bc08b815e3146bfd1e45fd7f47fc5

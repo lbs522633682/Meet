@@ -10,11 +10,9 @@ import android.provider.Settings;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.liboshuai.framework.utils.LogUtils;
-import com.liboshuai.framework.utils.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Author:boshuai.li

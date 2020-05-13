@@ -1,12 +1,9 @@
 package plat.skytv.client.meet;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.liboshuai.framework.base.BaseUIActivity;
 import com.liboshuai.framework.utils.LogUtils;
-import com.liboshuai.framework.utils.ToastUtil;
 
 import java.util.List;
 
@@ -30,7 +27,7 @@ public class MainActivity extends BaseUIActivity {
 
     private void requestPerssions() {
 
-         if (!checkWindowPermissions()) {
+        if (!checkWindowPermissions()) {
             requestWindowPermissions(PERMISSION_REQ_WINDOW_CODE);
         }
 
