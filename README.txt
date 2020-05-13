@@ -1,5 +1,28 @@
 开发日志 思考每一个遇到的问题
 -----------------------------------20200513---------------------------
+## 3D星球的实现
+    tagcloud ： com.moxun:tagcloudlib:1.2.0
+
+circleimageview?
+
+## Fragment 优化与切换
+### Fragment三个包
+    1.android.app.Fragment
+    2.android.app.v4.Fragment 向下兼容
+    3.androidx.fragment.app.Fragment
+
+### Fragment 关键类
+    1.FragmentManager 碎片化的管理类
+    2.FragmentTransation 操作Fragment做一些事务
+
+### FragMent 切换方式
+    1.replace 会重新走生命周期 用的较少
+    2.show/hide
+### Fragment 优化
+    onAttachFragment 此方法防止重叠
+    场景：当应用内存紧张的时候，系统会回收掉 Frament对象；
+    再次进入的时候会重新创建Fragment，并非原来的对象，我们无法控制，导致重叠
+
 ## APP启动优化
 ### 启动类型
     1.冷启动 第一次开始  或是 重装启动

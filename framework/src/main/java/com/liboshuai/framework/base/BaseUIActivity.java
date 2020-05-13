@@ -2,8 +2,6 @@ package com.liboshuai.framework.base;
 
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
-
 import com.liboshuai.framework.utils.SystemUI;
 
 /**
@@ -14,7 +12,7 @@ import com.liboshuai.framework.utils.SystemUI;
 public class BaseUIActivity extends BaseActivity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SystemUI.fixSystemUI(this);
     }

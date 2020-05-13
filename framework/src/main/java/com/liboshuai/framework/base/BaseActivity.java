@@ -26,6 +26,9 @@ import java.util.List;
  */
 public class BaseActivity extends AppCompatActivity {
 
+    public static final int PERMISSION_REQ_CODE = 1000;
+    public static final int PERMISSION_WINDOW_REQUEST_CODE = 1001;
+
     /**
      * 申请所需权限
      */
