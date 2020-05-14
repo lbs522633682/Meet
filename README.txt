@@ -1,4 +1,22 @@
 开发日志 思考每一个遇到的问题
+-----------------------------------20200514---------------------------
+## 头像上传 与 FileProvider
+
+### Android7.0 FileProvider
+
+### 从相册获取头像
+
+#### 圆形头像裁剪库
+    https://github.com/hdodenhof/CircleImageView
+
+    依赖：implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+### 解决URI获取不到真实地址的问题
+
+### Bmob更新用户资料
+
+### android 7.0 明文访问
+
 -----------------------------------20200513---------------------------
 ## 3D星球的实现
     tagcloud ： com.moxun:tagcloudlib:1.2.0

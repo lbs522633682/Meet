@@ -36,6 +36,13 @@ public class DialogManager {
         return new DialogView(context, layout, R.style.Theme_Dialog, Gravity.CENTER);
     }
 
+    /**
+     *
+     * @param context
+     * @param layout
+     * @param gravity Gravity.CENTER Gravity.BOTTOM Gravity.TOP
+     * @return
+     */
     public DialogView initView(Context context, int layout, int gravity) {
         return new DialogView(context, layout, R.style.Theme_Dialog, gravity);
     }

@@ -33,6 +33,7 @@ public class BaseActivity extends AppCompatActivity {
      * 申请所需权限
      */
     private static final String[] PERMISSIONS = {
+            Manifest.permission.CAMERA,
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};

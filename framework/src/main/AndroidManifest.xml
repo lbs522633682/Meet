@@ -17,4 +17,7 @@
     <!-- 窗口权限 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <!-- 相机权限 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
 </manifest>

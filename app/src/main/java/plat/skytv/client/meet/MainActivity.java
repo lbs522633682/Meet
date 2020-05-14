@@ -1,7 +1,9 @@
 package plat.skytv.client.meet;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -12,7 +14,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.liboshuai.framework.base.BaseUIActivity;
+import com.liboshuai.framework.bmob.BmobManager;
+import com.liboshuai.framework.entity.Consts;
+import com.liboshuai.framework.manager.DialogManager;
 import com.liboshuai.framework.utils.LogUtils;
+import com.liboshuai.framework.utils.SpUtils;
+import com.liboshuai.framework.view.DialogView;
 
 import java.util.List;
 
@@ -20,6 +27,8 @@ import plat.skytv.client.meet.fragment.ChatFragment;
 import plat.skytv.client.meet.fragment.MeFragment;
 import plat.skytv.client.meet.fragment.SquareFragment;
 import plat.skytv.client.meet.fragment.StarFragment;
+import plat.skytv.client.meet.service.CloudService;
+import plat.skytv.client.meet.ui.FirstUploadActivity;
 
 /**
  * Author:boshuai.li
@@ -28,6 +37,8 @@ import plat.skytv.client.meet.fragment.StarFragment;
  */
 public class MainActivity extends BaseUIActivity implements View.OnClickListener {
 
+    // 上传 头像 昵称的回调
+    public static final int UPLOAD_REQUEST_CODE = 1002;
 
     // Fragment 容器
     private FrameLayout mMainLayout;
@@ -66,12 +77,17 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
         initView();
     }
 
+    /**
+     * 请求权限
+     */
     private void requestPerssions() {
 
+        // 1.请求窗口权限
         if (!checkWindowPermissions()) {
             requestWindowPermissions(PERMISSION_WINDOW_REQUEST_CODE);
         }
 
+        // 2.请求全部权限组
         request(PERMISSION_REQ_CODE, new OnPermissionResult() {
             @Override
             public void OnSuccess() {
@@ -122,9 +138,59 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
 
 
         initFragment();
+
+        // 默认选择 星球tab
         checkMainTab(0);
+
+        checkToken();
     }
 
+    private void checkToken() {
+        // 获取token 需要三个参数 1.用户ObjectId 2.头像地址 3.昵称
+        String token = SpUtils.getInstance().getString(Consts.SP_TOKEN, null);
+        if (!TextUtils.isEmpty(token)) {
+            // 启动云服务去链接 融云服务
+            startService(new Intent(this, CloudService.class));
+        } else {
+            // 1. 有三个参数
+            String tokenPhoto = BmobManager.getInstance().getUser().getTokenPhoto();
+            String tokenNickName = BmobManager.getInstance().getUser().getTokenNickName();
+            if (!TextUtils.isEmpty(tokenPhoto) && !TextUtils.isEmpty(tokenNickName)) {
+                createToken();
+            } else {
+                createUploadDialog();
+            }
+        }
+    }
+
+    /**
+     * 创建一个上传的对话框
+     */
+    private void createUploadDialog() {
+        DialogView uploadView = DialogManager.getInstance().initView(this, R.layout.dialog_first_upload);
+        uploadView.setCancelable(false);
+        ImageView iv_go_upload = uploadView.findViewById(R.id.iv_go_upload);
+        iv_go_upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogManager.getInstance().hide(uploadView);
+                // 进入上传页面
+                FirstUploadActivity.startActivity(MainActivity.this, UPLOAD_REQUEST_CODE);
+            }
+        });
+
+        DialogManager.getInstance().show(uploadView);
+    }
+
+    /**
+     * 创建一个token
+     */
+    private void createToken() {
+    }
+
+    /**
+     * 初始化Fragment
+     */
     private void initFragment() {
         if (mFraChat == null) {
             mFraChat = new ChatFragment();
@@ -155,6 +221,11 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
         }
     }
 
+    /**
+     * 展示Fragment
+     *
+     * @param fragment
+     */
     private void showFragment(Fragment fragment) {
         if (fragment != null) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -164,6 +235,11 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
         }
     }
 
+    /**
+     * 隐藏所有的fragment
+     *
+     * @param fragmentTransaction
+     */
     private void hideAllFragment(FragmentTransaction fragmentTransaction) {
         if (mFraSquare != null) {
             fragmentTransaction.hide(mFraSquare);
@@ -179,6 +255,11 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
         }
     }
 
+    /**
+     * tab页 状态选择
+     *
+     * @param index
+     */
     private void checkMainTab(int index) {
         switch (index) {
             case 0:
@@ -251,6 +332,11 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
         }
     }
 
+    /**
+     * fragment 优化
+     *
+     * @param fragment
+     */
     @Override
     public void onAttachFragment(Fragment fragment) {
         if (mFraStar != null && fragment instanceof StarFragment) {
