@@ -13,6 +13,8 @@ public class Consts {
     // TOKEN
     public static final String SP_TOKEN = "token";
 
-    // 手机号码
+    // 手机号码/ 账号
     public static final String SP_PHONE = "k_phone";
+    // 密码
+    public static final String SP_PWD = "k_password";
 }

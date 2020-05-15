@@ -16,14 +16,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.liboshuai.framework.base.BaseBackActivity;
+import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.helper.BitmapHelper;
 import com.liboshuai.framework.helper.FileHelper;
 import com.liboshuai.framework.manager.DialogManager;
 import com.liboshuai.framework.utils.LogUtils;
+import com.liboshuai.framework.utils.ToastUtil;
 import com.liboshuai.framework.view.DialogView;
+import com.liboshuai.framework.view.LoadingView;
 
 import java.io.File;
 
+import cn.bmob.v3.exception.BmobException;
 import de.hdodenhof.circleimageview.CircleImageView;
 import plat.skytv.client.meet.R;
 
@@ -50,6 +54,8 @@ public class FirstUploadActivity extends BaseBackActivity implements View.OnClic
     private EditText et_nickname;
     private Button btn_upload;
 
+    private LoadingView mLoadingView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +66,9 @@ public class FirstUploadActivity extends BaseBackActivity implements View.OnClic
     private void initView() {
 
         initPhotoDialog();
+
+        mLoadingView = new LoadingView(this);
+        mLoadingView.setLoadingText("正在上传...");
 
         iv_photo = (CircleImageView) findViewById(R.id.iv_photo);
         et_nickname = (EditText) findViewById(R.id.et_nickname);
@@ -113,7 +122,7 @@ public class FirstUploadActivity extends BaseBackActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_upload:
-
+                uploadPhoto();
                 break;
             case R.id.iv_photo:
                 DialogManager.getInstance().show(mPhotoSelectView);
@@ -132,6 +141,30 @@ public class FirstUploadActivity extends BaseBackActivity implements View.OnClic
                 DialogManager.getInstance().hide(mPhotoSelectView);
                 break;
         }
+    }
+
+    /**
+     * 上传头像
+     */
+    private void uploadPhoto() {
+        mLoadingView.show();
+        String nickname = et_nickname.getText().toString().trim();
+        BmobManager.getInstance().uploadPhoto(nickname, uploadFile, new BmobManager.UploadPhotoListener() {
+            @Override
+            public void uploadDone() {
+                mLoadingView.hide();
+                // 将上传结果回传给MainActivity
+                setResult(RESULT_OK);
+                finish();
+            }
+
+            @Override
+            public void upLoadFail(BmobException e) {
+                LogUtils.i("upLoadFail = " + e);
+                mLoadingView.hide();
+                ToastUtil.showTextToast(FirstUploadActivity.this, "upLoadFail = " + e);
+            }
+        });
     }
 
     private void submit() {

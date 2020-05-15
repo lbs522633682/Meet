@@ -155,6 +155,7 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
             // 1. 有三个参数
             String tokenPhoto = BmobManager.getInstance().getUser().getTokenPhoto();
             String tokenNickName = BmobManager.getInstance().getUser().getTokenNickName();
+            LogUtils.i("checkToken tokenNickName = " + tokenNickName);
             if (!TextUtils.isEmpty(tokenPhoto) && !TextUtils.isEmpty(tokenNickName)) {
                 createToken();
             } else {
@@ -186,6 +187,7 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
      * 创建一个token
      */
     private void createToken() {
+        LogUtils.i("createToken enter");
     }
 
     /**
@@ -354,5 +356,16 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
         if (mFraSquare != null && fragment instanceof SquareFragment) {
             mFraSquare = (SquareFragment) fragment;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == UPLOAD_REQUEST_CODE) {
+                // 上传头像成功
+                checkToken();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

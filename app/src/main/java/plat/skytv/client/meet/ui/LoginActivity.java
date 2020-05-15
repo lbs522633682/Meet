@@ -27,6 +27,7 @@ import com.liboshuai.framework.view.TouchPictureV;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.LogInListener;
 import cn.bmob.v3.listener.QueryListener;
+import cn.bmob.v3.listener.SaveListener;
 import plat.skytv.client.meet.MainActivity;
 import plat.skytv.client.meet.R;
 
@@ -157,7 +158,42 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mLoadingView.show("正在登陆...");
 
-        BmobManager.getInstance().signOrLoginByMobilePhone(phone, code, new LogInListener<IMUser>() {
+        String account = SpUtils.getInstance().getString(Consts.SP_PHONE, null);
+        String pwd = SpUtils.getInstance().getString(Consts.SP_PWD, null);
+
+        if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd)) { // 本地无账号 注册流程
+            BmobManager.getInstance().signUp(phone, code, new SaveListener<IMUser>() {
+                @Override
+                public void done(IMUser imUser, BmobException e) {
+                    mLoadingView.hide();
+                    if (e == null) {
+                        LogUtils.i("signUp objId" + imUser.getObjectId());
+                        SpUtils.getInstance().putString(Consts.SP_PHONE, phone);
+                        SpUtils.getInstance().putString(Consts.SP_PWD, code);
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    } else {
+                        ToastUtil.showTextToast(LoginActivity.this, "Error = " + e.toString());
+                    }
+                }
+            });
+        } else {
+            // 已经登陆过，直接登录
+            BmobManager.getInstance().login(account, pwd, new LogInListener<IMUser>() {
+                @Override
+                public void done(IMUser o, BmobException e) {
+                    if (e == null) {
+                        LogUtils.i("login success");
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    } else {
+                        ToastUtil.showTextToast(LoginActivity.this, "Error = " + e.toString());
+                    }
+                }
+            });
+        }
+
+
+        // 短信条数可能用完，这里使用账号密码
+/*        BmobManager.getInstance().signOrLoginByMobilePhone(phone, code, new LogInListener<IMUser>() {
             @Override
             public void done(IMUser imUser, BmobException e) {
                 mLoadingView.hide();
@@ -172,7 +208,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     ToastUtil.showTextToast(LoginActivity.this, "Error = " + e.toString());
                 }
             }
-        });
+        });*/
+
 
     }
 
