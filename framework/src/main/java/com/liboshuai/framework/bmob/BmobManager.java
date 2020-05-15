@@ -148,7 +148,7 @@ public class BmobManager {
      */
     public void signUp(String phone, String pwd, SaveListener<IMUser> imUserSaveListener) {
         BmobUser bu = new BmobUser();
-        bu.setUsername("phone");
+        bu.setUsername(phone);
         bu.setPassword(pwd);
         //注意：不能用save方法进行注册
         bu.signUp(imUserSaveListener);
