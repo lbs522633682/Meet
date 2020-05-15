@@ -17,13 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import plat.skytv.client.meet.R;
+import plat.skytv.client.meet.ui.AddFriendActivity;
 
 /**
  * Author:boshuai.li
  * Time:2020/5/13   11:47
  * Description: 星球
  */
-public class StarFragment extends BaseFragment {
+public class StarFragment extends BaseFragment implements View.OnClickListener {
 
     private ImageView iv_camera;
     private ImageView iv_add;
@@ -68,6 +69,9 @@ public class StarFragment extends BaseFragment {
         tv_love = (TextView) view.findViewById(R.id.tv_love);
         ll_love = (LinearLayout) view.findViewById(R.id.ll_love);
 
+        iv_add.setOnClickListener(this);
+        iv_camera.setOnClickListener(this);
+
 
         for (int i = 0; i < 100; i++) {
             mStarList.add("star_" + i);
@@ -80,5 +84,16 @@ public class StarFragment extends BaseFragment {
                 ToastUtil.showTextToast(getActivity(), "position = " + position);
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.iv_add:
+                AddFriendActivity.startActivity(getActivity());
+                break;
+            case R.id.iv_camera:
+                break;
+        }
     }
 }

@@ -40,6 +40,9 @@
             android:name=".ui.FirstUploadActivity"
             android:label="@string/text_upload_title"
             android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.AddFriendActivity"
+            android:launchMode="singleTask" />
 
         <activity
             android:name=".MainActivity"
