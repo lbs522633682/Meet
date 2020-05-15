@@ -13,6 +13,26 @@
 
 ### 解决URI获取不到真实地址的问题
 
+    问题：跳转到相册，返回之后 通过data.getData().getPath(); 图片地址为：/external/images/media/134216，并非SD卡根目录地址
+    解决：通过返回的uri 去系统查询真实地址  /storage/emulated/0/MagazineUnlock/magazine-unlock-01-2.3.4332-_035B5B61EAFA5DB2B9982DCA612BA53C.jpg
+        /**
+     * 根据Uri获取真实的图片地址
+     * @param context
+     * @param uri
+     * @return
+     */
+    public String getRealImgPathFromUri(Context context, Uri uri) {
+
+        String[] proj = {MediaStore.Images.Media.DATA};
+        CursorLoader cursorLoader = new CursorLoader(context, uri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+        int columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(columnIndex);
+        cursor.close();
+        return path;
+    }
+
 ### Bmob更新用户资料
 
 ### android 7.0 明文访问

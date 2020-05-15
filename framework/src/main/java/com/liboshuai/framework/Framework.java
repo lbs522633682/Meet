@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.utils.SpUtils;
+import com.tencent.bugly.crashreport.CrashReport;
 
 /**
  * Author:boshuai.li
@@ -36,5 +37,7 @@ public class Framework {
     public void initFramework(Context context) {
         SpUtils.getInstance().initSp(context);
         BmobManager.getInstance().initBmob(context);
+        CrashReport.initCrashReport(context, "3f29febdac", true);
+
     }
 }

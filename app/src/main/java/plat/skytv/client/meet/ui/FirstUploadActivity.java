@@ -3,9 +3,11 @@ package plat.skytv.client.meet.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -13,8 +15,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.liboshuai.framework.FileHelper;
 import com.liboshuai.framework.base.BaseBackActivity;
+import com.liboshuai.framework.helper.BitmapHelper;
+import com.liboshuai.framework.helper.FileHelper;
 import com.liboshuai.framework.manager.DialogManager;
 import com.liboshuai.framework.utils.LogUtils;
 import com.liboshuai.framework.view.DialogView;
@@ -65,6 +68,29 @@ public class FirstUploadActivity extends BaseBackActivity implements View.OnClic
         iv_photo.setOnClickListener(this);
         btn_upload.setOnClickListener(this);
 
+        // 默认 上传按钮 不可点击
+        btn_upload.setEnabled(false);
+
+        et_nickname.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+                    btn_upload.setEnabled(uploadFile != null);
+                } else {
+                    btn_upload.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     /**
@@ -79,7 +105,6 @@ public class FirstUploadActivity extends BaseBackActivity implements View.OnClic
         tv_ablum.setOnClickListener(this);
         tv_cancel = (TextView) mPhotoSelectView.findViewById(R.id.tv_cancel);
         tv_cancel.setOnClickListener(this);
-
 
 
     }
@@ -101,6 +126,7 @@ public class FirstUploadActivity extends BaseBackActivity implements View.OnClic
             case R.id.tv_ablum:
                 DialogManager.getInstance().hide(mPhotoSelectView);
                 // 跳转相册
+                FileHelper.getInstance().toAlbum(this);
                 break;
             case R.id.tv_cancel:
                 DialogManager.getInstance().hide(mPhotoSelectView);
@@ -124,16 +150,34 @@ public class FirstUploadActivity extends BaseBackActivity implements View.OnClic
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         LogUtils.i("onActivityResult requestCode = " + requestCode);
 
+
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == FileHelper.CAMERA_REQUEST_CODE) {
                 uploadFile = FileHelper.getInstance().getTempFile();
+            } else if (requestCode == FileHelper.ALBUM_REQUEST_CODE) {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    LogUtils.i("onActivityResult path = " + uri.getPath());
+                    String imgRealPath = FileHelper.getInstance().getRealImgPathFromUri(this, uri);
+                    LogUtils.i("onActivityResult imgRealPath = " + imgRealPath);
+                    if (!TextUtils.isEmpty(imgRealPath)) {
+                        uploadFile = new File(imgRealPath);
+                    }
+                }
             }
         }
 
         // 设置头像
         if (uploadFile != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(uploadFile.getPath());
+            LogUtils.i("onActivityResult uploadFile.getPath() = " + uploadFile.getPath());
+            // 避免图片过大，引起OOM，进行压缩
+            Bitmap bitmap = BitmapHelper.getimage(uploadFile.getPath());
+            LogUtils.i("onActivityResult file size = " + uploadFile.length());
+
             iv_photo.setImageBitmap(bitmap);
+
+            String nickName = et_nickname.getText().toString().trim();
+            btn_upload.setEnabled(!TextUtils.isEmpty(nickName));
         }
 
         super.onActivityResult(requestCode, resultCode, data);

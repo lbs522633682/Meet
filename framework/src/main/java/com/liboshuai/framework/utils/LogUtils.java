@@ -24,6 +24,8 @@ import plat.skytv.client.framework.BuildConfig;
  */
 public class LogUtils {
 
+    public static boolean ALL_ERROR = true;
+
     @SuppressLint("SimpleDateFormat")
     private static SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
 
@@ -31,8 +33,12 @@ public class LogUtils {
         if (BuildConfig.LOG_DEBUG) {
 
             if (!TextUtils.isEmpty(text)) {
-                Log.i(BuildConfig.LOG_TAG, text);
-                writeToFile(text);
+                if (ALL_ERROR) {
+                    e(text);
+                } else {
+                    Log.i(BuildConfig.LOG_TAG, text);
+                    writeToFile(text);
+                }
             }
         }
     }

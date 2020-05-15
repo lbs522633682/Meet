@@ -40,7 +40,8 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+/*    implementation fileTree(dir: 'libs', include: ['*.jar'])*/
+    api fileTree(dir: 'libs', include: ['*.jar'])
     api rootProject.ext.dependencies["appcompat"]
     // bmob
     api rootProject.ext.dependencies["bmobsdk"]

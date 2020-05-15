@@ -1,13 +1,16 @@
-package com.liboshuai.framework;
+package com.liboshuai.framework.helper;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 
 import androidx.core.content.FileProvider;
+import androidx.loader.content.CursorLoader;
 
 import com.liboshuai.framework.utils.LogUtils;
 
@@ -50,6 +53,7 @@ public class FileHelper {
 
     /**
      * 开启相机
+     *
      * @param activity
      */
     public void toCamera(Activity activity) {
@@ -77,7 +81,36 @@ public class FileHelper {
         activity.startActivityForResult(i, CAMERA_REQUEST_CODE);
     }
 
+    /**
+     * 跳转到相册
+     *
+     * @param activity
+     */
+    public void toAlbum(Activity activity) {
+        Intent i = new Intent(Intent.ACTION_PICK);
+        i.setType("image/*");
+        activity.startActivityForResult(i, ALBUM_REQUEST_CODE);
+    }
+
     public File getTempFile() {
         return tempFile;
+    }
+
+    /**
+     * 根据Uri获取真实的图片地址
+     * @param context
+     * @param uri
+     * @return
+     */
+    public String getRealImgPathFromUri(Context context, Uri uri) {
+
+        String[] proj = {MediaStore.Images.Media.DATA};
+        CursorLoader cursorLoader = new CursorLoader(context, uri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+        int columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(columnIndex);
+        cursor.close();
+        return path;
     }
 }
