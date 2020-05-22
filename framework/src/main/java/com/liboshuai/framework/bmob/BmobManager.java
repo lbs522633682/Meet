@@ -7,10 +7,12 @@ import com.liboshuai.framework.utils.LogUtils;
 import java.io.File;
 
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobSMS;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.LogInListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
@@ -25,9 +27,8 @@ import cn.bmob.v3.listener.UploadFileListener;
 public class BmobManager {
 
     // 自己申请的key 需要开启独立域名的功能才能用
-    // private static final String BMOB_SDK_ID = "a3fc2edca9eccc01110110970f1b4091";
-    private static final String BMOB_SDK_ID = "f8efae5debf319071b44339cf51153fc";
-
+    private static final String BMOB_SDK_ID = "a3fc2edca9eccc01110110970f1b4091";
+    // private static final String BMOB_SDK_ID = "f8efae5debf319071b44339cf51153fc"; // 老师的Bmob已经开通独立域名
     private static BmobManager mBmobManager;
 
     private BmobManager() {
@@ -156,6 +157,7 @@ public class BmobManager {
 
     /**
      * 登录
+     *
      * @param phone
      * @param pwd
      * @param listener
@@ -165,11 +167,43 @@ public class BmobManager {
     }
 
     /**
+     * 查询所有用户
+     */
+    public void queryAllUser(FindListener<IMUser> listener) {
+        BmobQuery<IMUser> objectBmobQuery = new BmobQuery<>();
+        objectBmobQuery.findObjects(listener);
+    }
+
+    /**
      * 上传头像的回调
      */
     public interface UploadPhotoListener {
         void uploadDone();
 
         void upLoadFail(BmobException e);
+    }
+
+    /**
+     * 根据电话号码，查询用户
+     *
+     * @param phone
+     * @param listener
+     */
+    public void queryPhoneUser(String phone, FindListener<IMUser> listener) {
+        baseQuery("mobilePhoneNumber", phone, listener);
+    }
+
+    /**
+     * \
+     * 查询的基类
+     *
+     * @param key
+     * @param value
+     * @param listener
+     */
+    private void baseQuery(String key, String value, FindListener<IMUser> listener) {
+        BmobQuery<IMUser> objectBmobQuery = new BmobQuery<>();
+        objectBmobQuery.addWhereEqualTo(key, value);
+        objectBmobQuery.findObjects(listener);
     }
 }

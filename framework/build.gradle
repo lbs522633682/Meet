@@ -53,5 +53,6 @@ dependencies {
     api rootProject.ext.dependencies["tablayout"]
     api rootProject.ext.dependencies["circleimageview"]
     api rootProject.ext.dependencies["tagcloud"]
+    api rootProject.ext.dependencies["glide"]
 
 }

@@ -75,6 +75,9 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+
+        // 模拟数据到后台
+        // SimulationData.testData();
     }
 
     /**
