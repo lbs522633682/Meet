@@ -194,6 +194,8 @@ public class AddFriendActivity extends BaseBackActivity implements View.OnClickL
 
                         mAddFriendAdapter.notifyDataSetChanged();
                     }
+                } else {
+                    LogUtils.i("pushUser err = " + e);
                 }
             }
         });
