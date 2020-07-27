@@ -15,18 +15,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".ui.ContactFriendActivity"></activity>
 
-        // Bmob android 7.0 适配
         <provider
             android:name="cn.bmob.v3.util.BmobContentProvider"
-            android:authorities="plat.skytv.client.meet.BmobContentProvider"></provider>
-
-        <!--OPPO VIvo-->
+            android:authorities="plat.skytv.client.meet.BmobContentProvider" /> <!-- OPPO VIvo -->
         <meta-data
             android:name="android.max_aspect"
-            android:value="2.2" />
-
-        <!--小米适配-->
+            android:value="2.2" /> <!-- 小米适配 -->
         <meta-data
             android:name="notch.config"
             android:value="portrait|landscape" />
@@ -43,7 +39,6 @@
         <activity
             android:name=".ui.AddFriendActivity"
             android:launchMode="singleTask" />
-
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
@@ -51,17 +46,13 @@
             android:name=".ui.IndexActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/AppThemeFull">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- 链接融云的服务 -->
-        <service android:name=".service.CloudService" />
-
-        <!-- 兼容android7.0的Provider -->
+        </activity> <!-- 链接融云的服务 -->
+        <service android:name=".service.CloudService" /> <!-- 兼容android7.0的Provider -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="plat.skytv.client.meet.fileprovider"
@@ -70,9 +61,7 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
-
         </provider>
-
     </application>
 
 </manifest>

@@ -162,6 +162,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String pwd = SpUtils.getInstance().getString(Consts.SP_PWD, null);
 
         if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd)) { // 本地无账号 注册流程
+
             BmobManager.getInstance().signUp(phone, code, new SaveListener<IMUser>() {
                 @Override
                 public void done(IMUser imUser, BmobException e) {
@@ -171,13 +172,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         SpUtils.getInstance().putString(Consts.SP_PHONE, phone);
                         SpUtils.getInstance().putString(Consts.SP_PWD, code);
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
                     } else {
+                        LogUtils.i("signUp error = " + e.toString());
                         ToastUtil.showTextToast(LoginActivity.this, "Error = " + e.toString());
                     }
                 }
             });
         } else {
-            // 已经登陆过，直接登录
+            // 已经登陆过，直接登录 (使用账号密码)
             BmobManager.getInstance().login(account, pwd, new LogInListener<IMUser>() {
                 @Override
                 public void done(IMUser o, BmobException e) {
@@ -185,6 +188,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         LogUtils.i("login success");
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     } else {
+                        LogUtils.i("signUp error = " + e.toString());
                         ToastUtil.showTextToast(LoginActivity.this, "Error = " + e.toString());
                     }
                 }

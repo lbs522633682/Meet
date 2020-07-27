@@ -1,5 +1,6 @@
 package plat.skytv.client.meet.ui;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -89,7 +90,13 @@ public class AddFriendActivity extends BaseBackActivity implements View.OnClickL
             case R.id.iv_search:
                 queryFriendByPhone();
                 break;
-            case R.id.ll_to_contact:
+            case R.id.ll_to_contact: // 跳转到从通讯录导入
+                // 处理权限
+                if (checkPermission(Manifest.permission.READ_CONTACTS)) {
+                    startActivity(new Intent(this, ContactFriendActivity.class));
+                } else {
+                    requestPermission(new String[]{Manifest.permission.READ_CONTACTS});
+                }
                 break;
         }
     }
