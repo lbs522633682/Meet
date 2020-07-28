@@ -14,6 +14,7 @@ import com.liboshuai.framework.bmob.IMUser;
 import com.liboshuai.framework.utils.LogUtils;
 import com.liboshuai.framework.utils.ToastUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,8 @@ import java.util.Map;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import plat.skytv.client.meet.R;
+import plat.skytv.client.meet.adapter.AddFriendAdapter;
+import plat.skytv.client.meet.model.AddFriendModel;
 
 /**
  * Author:boshuai.li
@@ -31,6 +34,8 @@ public class ContactFriendActivity extends BaseBackActivity {
 
     private RecyclerView mContactView;
     private Map<String, String> mContactsMap = new HashMap<>();
+    private List<AddFriendModel> mList = new ArrayList<>();
+    private AddFriendAdapter adapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +48,18 @@ public class ContactFriendActivity extends BaseBackActivity {
         mContactView = (RecyclerView) findViewById(R.id.mContactView);
         mContactView.setLayoutManager(new LinearLayoutManager(this));
         mContactView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
+        adapter = new AddFriendAdapter(this, mList);
+        adapter.setOnclickListener(new AddFriendAdapter.OnclickListener() {
+            @Override
+            public void Onclick(int position) {
+                ToastUtil.showTextToast(ContactFriendActivity.this, "position = " + position);
+            }
+        });
         loadContacts();
 
         loadUsers();
+
+        mContactView.setAdapter(adapter);
     }
 
     /**
@@ -61,6 +74,7 @@ public class ContactFriendActivity extends BaseBackActivity {
                         if (e == null) {
                             if (list != null && list.size() > 0) {
                                 IMUser imUser = list.get(0);
+                                addContent(imUser, entry.getKey(), entry.getValue());
                             }
                         } else {
                             LogUtils.i("loadUsers queryPhoneUser error = " + e.toString());
@@ -88,5 +102,25 @@ public class ContactFriendActivity extends BaseBackActivity {
 
             mContactsMap.put(name, phone);
         }
+    }
+
+    private void addContent(IMUser imUser, String contactName, String contactPhone) {
+        AddFriendModel model = new AddFriendModel();
+        model.setType(AddFriendAdapter.TYPE_CONTENT);
+        model.setUserId(imUser.getObjectId());
+        model.setAge(imUser.getAge());
+        model.setDesc(imUser.getDesc());
+        model.setPhoto(imUser.getPhoto());
+        model.setNickName(imUser.getNickName());
+        model.setSex(model.isSex());
+
+        model.setContact(true);
+        model.setContactName(contactName);
+        model.setContactPhone(contactPhone);
+
+        mList.add(model);
+
+        adapter.notifyDataSetChanged();
+
     }
 }

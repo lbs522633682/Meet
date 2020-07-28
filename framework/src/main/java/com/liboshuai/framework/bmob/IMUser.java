@@ -24,7 +24,6 @@ public class IMUser extends BmobUser {
 
     // 其他属性
 
-
     private boolean sex = true; // 性别：true = 男 false = 女
     private String desc; // 简介
     private int age = 0;

@@ -65,14 +65,26 @@ public class AddFriendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             // 设置头像
             GlideHelper.loadUrl(mContext, addFriendModel.getPhoto(), ((ContentViewHolder) holder).iv_photo);
 
+            // 性别
             ((ContentViewHolder) holder).iv_sex.setImageResource(
                     addFriendModel.isSex() ? R.drawable.img_boy_icon : R.drawable.img_girl_icon);
 
+            // 年龄
             ((ContentViewHolder) holder).tv_age.setText(addFriendModel.getAge() + "");
 
+            // 昵称
             ((ContentViewHolder) holder).tv_nickname.setText(addFriendModel.getNickName());
 
+            //  描述
             ((ContentViewHolder) holder).tv_desc.setText(addFriendModel.getDesc());
+
+            if (addFriendModel.isContact()) { // 是联系人 显示 姓名 电话
+                ((ContentViewHolder) holder).ll_contact_info.setVisibility(View.VISIBLE);
+                ((ContentViewHolder) holder).tv_contact_name.setText(addFriendModel.getContactName());
+                ((ContentViewHolder) holder).tv_contact_phone.setText(addFriendModel.getContactPhone());
+            } else {
+                ((ContentViewHolder) holder).ll_contact_info.setVisibility(View.GONE);
+            }
         }
 
         // 点击事件
