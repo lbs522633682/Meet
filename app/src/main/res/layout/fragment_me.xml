@@ -16,7 +16,7 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/img_me_bg" />
+                android:background="@color/colorAccent" />
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/iv_me_photo"

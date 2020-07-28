@@ -88,20 +88,25 @@ public class ContactFriendActivity extends BaseBackActivity {
     }
 
     private void loadContacts() {
-        Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null);
+        Cursor cursor = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) { // android 8.0
+            cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null);
+            String name;
+            String phone;
+            while (cursor.moveToNext()) {
+                name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-        String name;
-        String phone;
-        while (cursor.moveToNext()) {
-            name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                phone = phone.replace(" ", "").replace("-", "");
 
-            phone = phone.replace(" ", "").replace("-", "");
+                LogUtils.i("loadContacts name = " + name + ", phone = " + phone);
 
-            LogUtils.i("loadContacts name = " + name + ", phone = " + phone);
-
-            mContactsMap.put(name, phone);
+                mContactsMap.put(name, phone);
+            }
+        } else {
+            ToastUtil.showTextLongToast(this, "系统小于8.0， 不支持导入");
         }
+
     }
 
     private void addContent(IMUser imUser, String contactName, String contactPhone) {

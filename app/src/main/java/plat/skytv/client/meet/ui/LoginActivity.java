@@ -161,6 +161,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String account = SpUtils.getInstance().getString(Consts.SP_PHONE, null);
         String pwd = SpUtils.getInstance().getString(Consts.SP_PWD, null);
 
+        // TODo 默认登录自己的账号 测试用
+        account = "15967153155";
+        pwd = "123456";
+
         if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd)) { // 本地无账号 注册流程
 
             BmobManager.getInstance().signUp(phone, code, new SaveListener<IMUser>() {

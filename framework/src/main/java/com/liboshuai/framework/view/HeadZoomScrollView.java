@@ -8,26 +8,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 
+import com.liboshuai.framework.utils.LogUtils;
+
 /**
  * FileName: HeadZoomScrollView
- * Founder: LiuGuiLin
+ * Founder: boshuai.li
  * Profile: 头部拉伸的View
  */
 public class HeadZoomScrollView extends ScrollView {
 
-    //头部View
+    // 头部view
     private View mZoomView;
-    private int mZoomViewWidth;
+    private int mZoomViewWith;
     private int mZoomViewHeight;
 
-    //是否在滑动
+    // 是否在滑动
     private boolean isScrolling = false;
-    //第一次按下的坐标
+    // 第一次按下的坐标
     private float firstPosition;
-    //滑动系数
+    // 滑动系数
     private float mScrollRate = 0.3f;
-    //回弹系数
+    // 回弹系数
     private float mReplyRate = 0.5f;
+
 
     public HeadZoomScrollView(Context context) {
         super(context);
@@ -41,15 +44,13 @@ public class HeadZoomScrollView extends ScrollView {
         super(context, attrs, defStyleAttr);
     }
 
-    /**
-     * 1.获取头部的View(操控的View)
-     * 2.滑动事件的处理
-     */
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        if (getChildAt(0) != null) {
-            ViewGroup vg = (ViewGroup) getChildAt(0);
+
+        View childView = getChildAt(0);
+        if (childView != null) { // 说明Scrollview有子view
+            ViewGroup vg = (ViewGroup) childView; // ScrollView的第一个View必定是一个ViewGroup
             if (vg.getChildAt(0) != null) {
                 mZoomView = vg.getChildAt(0);
             }
@@ -57,74 +58,93 @@ public class HeadZoomScrollView extends ScrollView {
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        //获取View的宽高
-        if (mZoomViewWidth <= 0 || mZoomViewHeight <= 0) {
-            mZoomViewWidth = mZoomView.getMeasuredWidth();
+    public boolean onTouchEvent(MotionEvent ev) {
+
+        // 获取view的宽高
+        if (mZoomViewWith <= 0 || mZoomViewHeight <= 0) {
             mZoomViewHeight = mZoomView.getMeasuredHeight();
+            mZoomViewWith = mZoomView.getMeasuredWidth();
         }
 
+        // 处理事件
         switch (ev.getAction()) {
             case MotionEvent.ACTION_MOVE:
-                if (!isScrolling) {
-                    //说明没有滑动
-                    if (getScrollY() == 0) {
-                        //没有滑动说明是第一次滑动 记录
+                if (!isScrolling) { // 不在 滑动
+                    if (getScrollY() == 0) { // 第一次 没有 滑动， 记录初始位置
                         firstPosition = ev.getY();
                     } else {
                         break;
                     }
                 }
-                //计算缩放值
-                //公式：(当前的位置 - 第一次按下的位置) * 缩放系数
+
+                // 计算缩放值 = （当前位置 - 初始位置）* 缩放系数
+
                 int distance = (int) ((ev.getY() - firstPosition) * mScrollRate);
+
                 if (distance < 0) {
                     break;
                 }
                 isScrolling = true;
+
                 setZoomView(distance);
+
                 break;
+
             case MotionEvent.ACTION_UP:
                 isScrolling = false;
+
                 replyZoomView();
                 break;
         }
-        return super.dispatchTouchEvent(ev);
+
+        return true;
     }
 
     /**
-     * 回调动画
+     * 属性动画 回弹
      */
     private void replyZoomView() {
-        //计算下拉的缩放值再让属性动画根据这个值复原
-        int distance = mZoomView.getMeasuredWidth() - mZoomViewWidth;
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(distance,0)
+        int distance = mZoomView.getMeasuredWidth() - mZoomViewWith;
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(distance, 0)
                 .setDuration((long) (distance * mReplyRate));
+
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                setZoomView((Float) animation.getAnimatedValue());
+                LogUtils.i("onAnimationUpdate value = " + animation.getAnimatedValue());
+                setZoomView((float) animation.getAnimatedValue());
             }
         });
+
         valueAnimator.start();
     }
 
     /**
-     * 缩放View
+     * 设置缩放的view
      *
-     * @param zoom
+     * @param distance
      */
-    private void setZoomView(float zoom) {
-        if (mZoomViewWidth <= 0 || mZoomViewHeight <= 0) {
+    private void setZoomView(float distance) {
+        LogUtils.i("setZoomView distance = " + distance);
+        if (mZoomViewWith <= 0 || mZoomViewHeight <= 0) {
             return;
         }
+
         ViewGroup.LayoutParams lp = mZoomView.getLayoutParams();
-        lp.width = (int) (mZoomViewWidth + zoom);
-        // 现在的宽/原本的宽 得到 缩放比例 * 原本的高 得到缩放的高
-        lp.height = (int) (mZoomViewHeight * ((mZoomViewWidth + zoom) / mZoomViewWidth));
-        //设置间距
-        //公式：- (lp.width - mZoomViewWidth) / 2
-        ((MarginLayoutParams) lp).setMargins(-(lp.width - mZoomViewWidth) / 2, 0, 0, 0);
+
+        // 重新设置宽高
+        lp.width = (int) (mZoomViewWith + distance);
+
+        // 高 = 原来的高 * 变换系数 （= 现在的宽/原始的宽）
+
+        // 变换系数需要使用float类型的参数
+        lp.height = (int) (mZoomViewHeight * ((mZoomViewWith + distance) / mZoomViewWith));
+
+        LogUtils.i("setZoomView lp.width = " + lp.width + ", lp.height = " + lp.height);
+
+        // 设置间距 left = - (现在的宽 - 原始的宽)/2
+        ((MarginLayoutParams) lp).setMargins(-(lp.width - mZoomViewWith) / 2, 0, 0, 0);
+
         mZoomView.setLayoutParams(lp);
     }
 }
