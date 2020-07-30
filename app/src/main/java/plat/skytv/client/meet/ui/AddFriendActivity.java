@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.liboshuai.framework.adapter.CommonAdapter;
+import com.liboshuai.framework.adapter.CommonViewHolder;
 import com.liboshuai.framework.base.BaseBackActivity;
 import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.bmob.IMUser;
@@ -37,6 +39,8 @@ import plat.skytv.client.meet.model.AddFriendModel;
  */
 public class AddFriendActivity extends BaseBackActivity implements View.OnClickListener {
 
+    public static final int TYPE_TITLE = 0;
+    public static final int TYPE_CONTENT = 1;
 
     private LinearLayout ll_to_contact;
     private EditText et_phone;
@@ -44,7 +48,8 @@ public class AddFriendActivity extends BaseBackActivity implements View.OnClickL
     private RecyclerView mSearchResultView;
     private View include_empty_view;
 
-    private AddFriendAdapter mAddFriendAdapter;
+    //    private AddFriendAdapter mAddFriendAdapter;
+    private CommonAdapter<AddFriendModel> mAddFriendAdapter;
     private List<AddFriendModel> mList = new ArrayList<>();
 
     public static void startActivity(Context context) {
@@ -73,15 +78,63 @@ public class AddFriendActivity extends BaseBackActivity implements View.OnClickL
 
         mSearchResultView.setLayoutManager(new LinearLayoutManager(this));
         mSearchResultView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        mAddFriendAdapter = new AddFriendAdapter(this, mList);
+        //mAddFriendAdapter = new AddFriendAdapter(this, mList);
+        mAddFriendAdapter = new CommonAdapter<AddFriendModel>(mList, new CommonAdapter.OnMoreBindDataListener<AddFriendModel>() {
+            @Override
+            public int getItemType(int position) {
+                return mList.get(position).getType();
+            }
+
+            @Override
+            public void onBindViewHolder(AddFriendModel model, CommonViewHolder viewHolder, int type, int position) {
+                if (type == TYPE_TITLE) {
+                    viewHolder.setText(R.id.tv_title, model.getTitle());
+                } else if (type == TYPE_CONTENT) {
+                    // 设置头像
+                    viewHolder.setImageUrl(AddFriendActivity.this, R.id.iv_photo, model.getPhoto());
+
+                    // 性别
+                    viewHolder.setImageResource(R.id.iv_sex, model.isSex()
+                            ? R.drawable.img_boy_icon : R.drawable.img_girl_icon);
+
+                    // 年龄
+                    viewHolder.setText(R.id.tv_age, model.getAge() + "");
+
+                    // 昵称
+                    viewHolder.setText(R.id.tv_nickname, model.getNickName());
+
+                    //  描述
+                    viewHolder.setText(R.id.tv_desc, model.getDesc());
+
+                    if (model.isContact()) { // 是联系人 显示 姓名 电话
+                        viewHolder.setVisibility(R.id.ll_contact_info, View.VISIBLE);
+                        viewHolder.setText(R.id.tv_contact_name, model.getContactName());
+                        viewHolder.setText(R.id.tv_contact_phone, model.getContactPhone());
+
+                    } else {
+;                        viewHolder.setVisibility(R.id.ll_contact_info, View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public int getLayoutId(int type) {
+                if (TYPE_TITLE == type) {
+                    return R.layout.layout_search_title_item;
+                } else if (TYPE_CONTENT == type) {
+                    return R.layout.layout_search_user_item;
+                }
+                return 0;
+            }
+        });
         mSearchResultView.setAdapter(mAddFriendAdapter);
 
-        mAddFriendAdapter.setOnclickListener(new AddFriendAdapter.OnclickListener() {
+        /*mAddFriendAdapter.setOnclickListener(new AddFriendAdapter.OnclickListener() {
             @Override
             public void Onclick(int position) {
                 ToastUtil.showTextToast(AddFriendActivity.this, "show position = " + position);
             }
-        });
+        });*/
     }
 
     @Override

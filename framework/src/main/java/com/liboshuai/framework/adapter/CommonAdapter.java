@@ -16,17 +16,18 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<CommonViewHolder> {
     // 数据源 未知类型
     private List<T> mList;
 
-    private OnBindDataListener onBindDataListener;
-    private OnMoreBindDataListener onMoreBindDataListener;
+    private OnBindDataListener<T> onBindDataListener;
+    private OnMoreBindDataListener<T> onMoreBindDataListener;
 
-    public CommonAdapter(List<T> mList, OnBindDataListener onBindDataListener) {
+    public CommonAdapter(List<T> mList, OnBindDataListener<T> onBindDataListener) {
         this.mList = mList;
         this.onBindDataListener = onBindDataListener;
     }
 
-    public CommonAdapter(List<T> mList, OnMoreBindDataListener onMoreBindDataListener) {
+    public CommonAdapter(List<T> mList, OnMoreBindDataListener<T> onMoreBindDataListener) {
         this.mList = mList;
         this.onMoreBindDataListener = onMoreBindDataListener;
+        this.onBindDataListener = onMoreBindDataListener;
     }
 
     // 绑定单一类型的数据
@@ -37,7 +38,7 @@ public class CommonAdapter<T> extends RecyclerView.Adapter<CommonViewHolder> {
     }
 
     // 绑定多类型的数据
-    public interface OnMoreBindDataListener<T> extends OnBindDataListener {
+    public interface OnMoreBindDataListener<T> extends OnBindDataListener<T> {
         int getItemType(int position);
     }
 
