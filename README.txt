@@ -1,7 +1,46 @@
 
 开发日志 思考每一个遇到的问题
+-----------------------------------20200730---------------------------
+## Rxjava 的使用
+### 引用
+    io.reactivex.rxjava2:rxjava:2.2.2
+    io.reactivex.rxjava2:rxandroid:2.1.0"
+
+### 举例
+
+    disposable = Observable.create(new ObservableOnSubscribe<String>() { // 创建一个发射器，发射器的返回类型是 String的
+
+        @Override
+        public void subscribe(ObservableEmitter<String> emitter) throws Exception { // 在发射器中执行请求过程
+            String json = HttpManager.getInstance().postCloudToken(map);
+
+            emitter.onNext(json); // 使用发射器将  结果 发射出去
+            emitter.onComplete(); // 告知发射器 执行完成
+        }
+    }).subscribeOn(Schedulers.newThread()) // 订阅者 子线程
+            .observeOn(AndroidSchedulers.mainThread()) // 观察者 主线程
+            .subscribe(new Consumer<String>() { 使用接收器 接收结果
+                @Override
+                public void accept(String s) throws Exception {
+                    // {"code":200,"userId":"b757a3c83d","token":"Edr2bmMy5wa59uh+UAR0Oa3dR1vFJod+bYKsvjVGsBI=@yby3.cn.rongnav.com;yby3.cn.rongcfg.com"}
+                    LogUtils.i("createToken s = " + s);
+                    parsingToken(s);
+                }
+            });
+
+## 获取融云的token
+    功能：即时通讯 跟音视频
+
+## 融云参数 自己的
+    账号： 15967153155 li666666
+    appkey：25wehl3u20a0w
+    appSecrect: SRlG9pAHfH
+
+## android 7.0 的明文访问
+    cleartextTrafficPermitted
 -----------------------------------20200728---------------------------
 ## 封装万能的RecycleView适配器
+    主要是相关的 泛型的使用
 
 ## 自定义的头部拉伸ScrollView
     1.思路 触摸事件 放大、回弹效果

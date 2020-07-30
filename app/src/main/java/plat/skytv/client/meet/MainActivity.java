@@ -17,12 +17,23 @@ import com.liboshuai.framework.base.BaseUIActivity;
 import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.entity.Consts;
 import com.liboshuai.framework.manager.DialogManager;
+import com.liboshuai.framework.manager.HttpManager;
+import com.liboshuai.framework.utils.JsonUtil;
 import com.liboshuai.framework.utils.LogUtils;
 import com.liboshuai.framework.utils.SpUtils;
 import com.liboshuai.framework.view.DialogView;
 
+import java.util.HashMap;
 import java.util.List;
 
+import gson.TokenBean;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import plat.skytv.client.meet.fragment.ChatFragment;
 import plat.skytv.client.meet.fragment.MeFragment;
 import plat.skytv.client.meet.fragment.SquareFragment;
@@ -69,6 +80,8 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
     private TextView tv_chat;
     private ImageView iv_me;
     private TextView tv_me;
+
+    private Disposable disposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,12 +161,14 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
         checkToken();
     }
 
+    /**
+     * 校验融云的token获取
+     */
     private void checkToken() {
         // 获取token 需要三个参数 1.用户ObjectId 2.头像地址 3.昵称
         String token = SpUtils.getInstance().getString(Consts.SP_TOKEN, null);
         if (!TextUtils.isEmpty(token)) {
-            // 启动云服务去链接 融云服务
-            startService(new Intent(this, CloudService.class));
+            startCloudService();
         } else {
             // 1. 有三个参数
             String tokenPhoto = BmobManager.getInstance().getUser().getTokenPhoto();
@@ -191,6 +206,53 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
      */
     private void createToken() {
         LogUtils.i("createToken enter");
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put("userId", BmobManager.getInstance().getUser().getObjectId());
+        map.put("name", BmobManager.getInstance().getUser().getTokenNickName());
+        map.put("portraitUri", BmobManager.getInstance().getUser().getTokenPhoto());
+
+        disposable = Observable.create(new ObservableOnSubscribe<String>() {
+
+            @Override
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+                String json = HttpManager.getInstance().postCloudToken(map);
+
+                emitter.onNext(json);
+                emitter.onComplete();
+            }
+        }).subscribeOn(Schedulers.newThread()) // 订阅者 子线程
+                .observeOn(AndroidSchedulers.mainThread()) // 观察者 主线程
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        // {"code":200,"userId":"b757a3c83d","token":"Edr2bmMy5wa59uh+UAR0Oa3dR1vFJod+bYKsvjVGsBI=@yby3.cn.rongnav.com;yby3.cn.rongcfg.com"}
+                        LogUtils.i("createToken s = " + s);
+                        parsingToken(s);
+                    }
+                });
+    }
+
+    /**
+     * 解析融云token
+     *
+     * @param s
+     */
+    private void parsingToken(String s) {
+        if (!TextUtils.isEmpty(s)) {
+            TokenBean tokenBean = JsonUtil.parseObject(s, TokenBean.class);
+            if (tokenBean.getCode() == 200) {
+                SpUtils.getInstance().putString(Consts.SP_TOKEN, tokenBean.getToken());
+                startCloudService();
+            }
+        }
+    }
+
+    /**
+     * 启动云服务去链接 融云服务
+     */
+    private void startCloudService() {
+        startService(new Intent(this, CloudService.class));
     }
 
     /**
@@ -370,5 +432,13 @@ public class MainActivity extends BaseUIActivity implements View.OnClickListener
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (disposable != null) {
+            disposable.dispose();
+        }
     }
 }

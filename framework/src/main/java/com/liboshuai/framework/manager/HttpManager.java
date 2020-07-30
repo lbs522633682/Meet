@@ -2,6 +2,8 @@ package com.liboshuai.framework.manager;
 
 import android.content.Context;
 
+import com.liboshuai.framework.utils.SHA1;
+
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -16,6 +18,13 @@ import okhttp3.RequestBody;
  * Profile: OkHttp
  */
 public class HttpManager {
+
+    /**
+     * 融云相关参数
+     */
+    private static final String RONGCLOUD_GET_TOKEN = "http://api-cn.ronghub.com/user/getToken.json";
+    private static final String CLOUD_SECRECT = "SRlG9pAHfH";
+    private static final String CLOUD_KEY = "25wehl3u20a0w";
 
     private static final String HEAD_CONTENT_TYPE = "Content-Type";
     private static final String CONTENT_TYPE_JSON = "application/json; charset=utf-8";
@@ -103,5 +112,44 @@ public class HttpManager {
      */
     public long getTimeStamp() {
         return System.currentTimeMillis() / 1000;
+    }
+
+    /**
+     * 获取融云的token
+     *
+     * @param map
+     * @return
+     */
+    public String postCloudToken(HashMap<String, String> map) {
+
+        // 参数
+        String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
+        String nonce = String.valueOf(Math.floor(Math.random() * 1000000));
+        String signature = SHA1.sha1(CLOUD_SECRECT + nonce + timeStamp);
+
+
+        FormBody.Builder bodyBuilder = new FormBody.Builder();
+        for (String key : map.keySet()) {
+            bodyBuilder.add(key, map.get(key));
+        }
+
+        RequestBody reqBody = bodyBuilder.build();
+
+        Request request = new Request.Builder()
+                .header("App-Key", CLOUD_KEY) // 开发者平台分配的 App Key。
+                .header("Nonce", nonce) // 随机数，无长度限制。
+                .header("Timestamp", timeStamp) // 时间戳
+                .header("Signature", signature) // 数据签名
+                .url(RONGCLOUD_GET_TOKEN)
+                .post(reqBody)
+                .build();
+
+        try {
+            return mOkHttpClient.newCall(request).execute().body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+
     }
 }
