@@ -36,6 +36,7 @@ public class CloudService extends Service {
      */
     private void linkCloudServer() {
         String token = SpUtils.getInstance().getString(Consts.SP_TOKEN, "");
+        LogUtils.i("linkCloudServer token = " + token);
         CloudManager.getInstance().connect(token);
         CloudManager.getInstance().setOnReceiveMessageListener(new RongIMClient.OnReceiveMessageListener() {
             @Override

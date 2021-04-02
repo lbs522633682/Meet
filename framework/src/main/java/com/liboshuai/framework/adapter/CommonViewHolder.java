@@ -106,4 +106,10 @@ public class CommonViewHolder extends RecyclerView.ViewHolder {
         view.setVisibility(visibility);
         return this;
     }
+
+    public CommonViewHolder setBackgroundColor(int viewId, int bgColor) {
+        View view = getView(viewId);
+        view.setBackgroundColor(bgColor);
+        return this;
+    }
 }

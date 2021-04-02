@@ -2,8 +2,25 @@
 开发日志 思考每一个遇到的问题
 -----------------------------------20210402---------------------------
 
+## 未完成
+
+    4. 发送添加好友消息
+
+    5. 自定义消息内容
+
+    6. 接受添加好友消息
+
 ## 已完成
     1. 兼容小于 8.0 的通讯录导入功能
+
+    2. 融云的消息体系
+
+        https://www.rongcloud.cn/docs/message_architecture.html
+        
+
+    3. 测试消息发送 和接收
+    // Message{conversationType=PRIVATE, targetId='b757a3c83d', messageId=1, messageDirection=SEND, senderUserId='b757a3c83d', receivedStatus=io.rong.imlib.model.Message$ReceivedStatus@71d6636, sentStatus=SENT, receivedTime=0, sentTime=1617348347101, objectName='RC:TxtMsg', content=TextMessage{content='很高兴认识你', extra='null'}, extra='null', readReceiptInfo=null, messageConfig=null, UId='BOI5-SK9N-E386-HI5F'}
+	
 
 -----------------------------------20200811---------------------------
 ## 融云的继承与服务链接

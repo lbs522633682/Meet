@@ -114,6 +114,14 @@ public class AddFriendActivity extends BaseBackActivity implements View.OnClickL
                     } else {
 ;                        viewHolder.setVisibility(R.id.ll_contact_info, View.GONE);
                     }
+
+                    // 点击事件
+                    viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            UserInfoActivity.startActivity(AddFriendActivity.this, model.getUserId());
+                        }
+                    });
                 }
             }
 

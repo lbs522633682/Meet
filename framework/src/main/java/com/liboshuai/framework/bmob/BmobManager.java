@@ -194,6 +194,15 @@ public class BmobManager {
     }
 
     /**
+     * 根据 userid 查询用户信息
+     * @param userId
+     * @param listener
+     */
+    public void queryObjectIdUser(String userId, FindListener<IMUser> listener) {
+        baseQuery("objectId", userId, listener);
+    }
+
+    /**
      * \
      * 查询的基类
      *

@@ -4,7 +4,12 @@ import android.content.Context;
 
 import com.liboshuai.framework.utils.LogUtils;
 
+import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Message;
+import io.rong.imlib.model.MessageContent;
+import io.rong.message.TextMessage;
 
 /**
  * Author:boshuai.li
@@ -20,6 +25,26 @@ public class CloudManager {
     public static final String CLOUD_KEY = "25wehl3u20a0w";
 
     private static CloudManager mInstnce;
+
+    /**
+     * 发送消息的结果回调
+     */
+    IRongCallback.ISendMessageCallback iSendMessageCallback = new IRongCallback.ISendMessageCallback() {
+        @Override
+        public void onAttached(Message message) { // 消息存到本地数据库的回调
+            //LogUtils.i("iSendMessageCallback onAttached message = " + message);
+        }
+
+        @Override
+        public void onSuccess(Message message) {
+            LogUtils.i("iSendMessageCallback onSuccess message = " + message);
+        }
+
+        @Override
+        public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+            LogUtils.i("iSendMessageCallback onError message = " + message);
+        }
+    };
 
     private CloudManager() {
     }
@@ -41,6 +66,7 @@ public class CloudManager {
 
     /**
      * 链接融云服务
+     *
      * @param token
      */
     public void connect(String token) {
@@ -49,6 +75,8 @@ public class CloudManager {
             @Override
             public void onSuccess(String s) {
                 LogUtils.i("connect s = " + s);
+                // 测试消息 发送
+                CloudManager.getInstance().sendTextMessage("很高兴认识你", "b757a3c83d");
             }
 
             @Override
@@ -79,9 +107,28 @@ public class CloudManager {
 
     /**
      * 设置消息的监听器
+     *
      * @param listener
      */
     public void setOnReceiveMessageListener(RongIMClient.OnReceiveMessageListener listener) {
         RongIMClient.setOnReceiveMessageListener(listener);
+    }
+
+    /**
+     * 发送文本消息
+     *
+     * @param message
+     * @param targetId
+     */
+    public void sendTextMessage(String message, String targetId) {
+        /*public void sendMessage(Conversation.ConversationType type, String targetId, MessageContent
+        content, String pushContent, String pushData, IRongCallback.ISendMessageCallback callback) {*/
+        TextMessage textMessage = TextMessage.obtain(message);
+        RongIMClient.getInstance().sendMessage(Conversation.ConversationType.PRIVATE,
+                targetId,
+                textMessage,
+                null,
+                null,
+                iSendMessageCallback);
     }
 }
