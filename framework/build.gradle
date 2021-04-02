@@ -54,5 +54,6 @@ dependencies {
     api rootProject.ext.dependencies["circleimageview"]
     api rootProject.ext.dependencies["tagcloud"]
     api rootProject.ext.dependencies["glide"]
+    api project(path: ':IMLib')
 
 }

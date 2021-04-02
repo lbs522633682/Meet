@@ -103,6 +103,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         btn_send_code.setOnClickListener(this);
         btn_login.setOnClickListener(this);
+        tv_test_login.setOnClickListener(this);
 
         // 获取保存的phone 显示
         String phone = SpUtils.getInstance().getString(Consts.SP_PHONE, "");
@@ -137,7 +138,41 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.btn_login:
                 login();
                 break;
+            case R.id.tv_test_login:
+                loginTest();
+                break;
         }
+    }
+
+    private void loginTest() {
+
+        // 展示loading
+
+        mLoadingView.show("正在登陆...");
+
+        String account = SpUtils.getInstance().getString(Consts.SP_PHONE, null);
+        String pwd = SpUtils.getInstance().getString(Consts.SP_PWD, null);
+
+        // TODo 默认登录自己的账号 测试用
+        account = "15967153155";
+        pwd = "123456";
+
+        et_phone.setText(account);
+        et_code.setText(pwd);
+
+        // 已经登陆过，直接登录 (使用账号密码)
+        BmobManager.getInstance().login(account, pwd, new LogInListener<IMUser>() {
+            @Override
+            public void done(IMUser o, BmobException e) {
+                if (e == null) {
+                    LogUtils.i("login success");
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                } else {
+                    LogUtils.i("signUp error = " + e.toString());
+                    ToastUtil.showTextToast(LoginActivity.this, "Error = " + e.toString());
+                }
+            }
+        });
     }
 
     private void login() {

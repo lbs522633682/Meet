@@ -40,4 +40,13 @@ public class TokenBean {
     public void setToken(String token) {
         this.token = token;
     }
+
+    @Override
+    public String toString() {
+        return "TokenBean{" +
+                "code=" + code +
+                ", userId='" + userId + '\'' +
+                ", token='" + token + '\'' +
+                '}';
+    }
 }

@@ -1,6 +1,7 @@
 package plat.skytv.client.meet.ui;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 
@@ -104,7 +105,27 @@ public class ContactFriendActivity extends BaseBackActivity {
                 mContactsMap.put(name, phone);
             }
         } else {
-            ToastUtil.showTextLongToast(this, "系统小于8.0， 不支持导入");
+            //ToastUtil.showTextLongToast(this, "系统小于8.0， 不支持导入");
+            Uri contactUri =ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+            cursor = getContentResolver().query(contactUri,
+                    new String[]{"display_name", "sort_key", "contact_id","data1"},
+                    null, null, "sort_key");
+            String name;
+            String phone;
+            while (cursor.moveToNext()) {
+                name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+                phone = phone.replace(" ", "").replace("-", "");
+
+                LogUtils.i("loadContacts name = " + name + ", phone = " + phone);
+
+                mContactsMap.put(name, phone);
+            }
+        }
+
+        if (cursor != null) {
+            cursor.close();
         }
 
     }

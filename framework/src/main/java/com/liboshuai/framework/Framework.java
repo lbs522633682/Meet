@@ -3,6 +3,7 @@ package com.liboshuai.framework;
 import android.content.Context;
 
 import com.liboshuai.framework.bmob.BmobManager;
+import com.liboshuai.framework.manager.CloudManager;
 import com.liboshuai.framework.utils.SpUtils;
 import com.tencent.bugly.crashreport.CrashReport;
 
@@ -38,6 +39,7 @@ public class Framework {
         SpUtils.getInstance().initSp(context);
         BmobManager.getInstance().initBmob(context);
         CrashReport.initCrashReport(context, "3f29febdac", true);
+        CloudManager.getInstance().init(context);
 
     }
 }

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -19,15 +20,10 @@ import okhttp3.RequestBody;
  */
 public class HttpManager {
 
-    /**
-     * 融云相关参数
-     */
-    private static final String RONGCLOUD_GET_TOKEN = "http://api-cn.ronghub.com/user/getToken.json";
-    private static final String CLOUD_SECRECT = "SRlG9pAHfH";
-    private static final String CLOUD_KEY = "25wehl3u20a0w";
-
     private static final String HEAD_CONTENT_TYPE = "Content-Type";
     private static final String CONTENT_TYPE_JSON = "application/json; charset=utf-8";
+
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     // 与服务端定好协议
     public static String HEAD_TIMESTAMP = "timestamp";
@@ -48,6 +44,21 @@ public class HttpManager {
             }
         }
         return mInstnce;
+    }
+
+    public String post(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(JSON, json);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .addHeader(HEAD_CONTENT_TYPE, CONTENT_TYPE_JSON)
+                .build();
+        try {
+            return mOkHttpClient.newCall(request).execute().body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     /**
@@ -125,7 +136,7 @@ public class HttpManager {
         // 参数
         String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
         String nonce = String.valueOf(Math.floor(Math.random() * 1000000));
-        String signature = SHA1.sha1(CLOUD_SECRECT + nonce + timeStamp);
+        String signature = SHA1.sha1(CloudManager.CLOUD_SECRECT + nonce + timeStamp);
 
 
         FormBody.Builder bodyBuilder = new FormBody.Builder();
@@ -136,11 +147,11 @@ public class HttpManager {
         RequestBody reqBody = bodyBuilder.build();
 
         Request request = new Request.Builder()
-                .header("App-Key", CLOUD_KEY) // 开发者平台分配的 App Key。
+                .header("App-Key", CloudManager.CLOUD_KEY) // 开发者平台分配的 App Key。
                 .header("Nonce", nonce) // 随机数，无长度限制。
                 .header("Timestamp", timeStamp) // 时间戳
                 .header("Signature", signature) // 数据签名
-                .url(RONGCLOUD_GET_TOKEN)
+                .url(CloudManager.RONGCLOUD_GET_TOKEN)
                 .post(reqBody)
                 .build();
 

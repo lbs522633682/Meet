@@ -23,6 +23,10 @@ android {
 
         // 调试，release要删除
         resConfigs("zh", "xxhdpi")
+
+        ndk {
+            //
+        }
     }
     buildTypes {
         debug {
