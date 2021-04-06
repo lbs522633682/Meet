@@ -4,6 +4,9 @@ import android.content.Context;
 
 import com.liboshuai.framework.utils.LogUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
@@ -23,6 +26,20 @@ public class CloudManager {
     public static final String RONGCLOUD_GET_TOKEN = "http://api-cn.ronghub.com/user/getToken.json";
     public static final String CLOUD_SECRECT = "SRlG9pAHfH";
     public static final String CLOUD_KEY = "25wehl3u20a0w";
+
+    // ObjectName
+    public static final String MSG_TEXT_NAME = "RC:TXTMsg";
+    public static final String MSG_IMAGE_NAME = "RC:ImgMsg";
+    public static final String MSG_LOCATION_NAME = "RC:LBSMsg";
+
+    // msgType
+    // 普通消息
+    public static final String TYPE_TEXT = "TYPE_TEXT";
+    // 添加好友的消息
+    public static final String TYPE_ADD_FRIEND = "TYPE_ADD_FRIEND";
+    // 同意添加好友的消息
+    public static final String TYPE_AGREED_FRIEND = "TYPE_AGREED_FRIEND";
+
 
     private static CloudManager mInstnce;
 
@@ -130,5 +147,24 @@ public class CloudManager {
                 null,
                 null,
                 iSendMessageCallback);
+    }
+
+    /**
+     * 发送多类型的 文本消息
+     *
+     * @param message
+     * @param type
+     * @param targetId
+     */
+    public void sendTextMessage(String message, String type, String targetId) {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("msg", message);
+            jsonObject.put("type", type); // 如果没有type，则为普通类型
+            sendTextMessage(jsonObject.toString(), targetId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

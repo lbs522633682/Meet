@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+
+    <!-- 本地数据库名称 -->
+    <dbname value="NewFriend" />
+
+    <!-- 本地数据库版本 -->
+    <version value="1" />
+
+    <list>
+        <mapping class="com.liboshuai.framework.db.NewFriend" />
+    </list>
+
+
+</litepal>

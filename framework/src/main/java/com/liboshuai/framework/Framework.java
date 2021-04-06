@@ -7,6 +7,8 @@ import com.liboshuai.framework.manager.CloudManager;
 import com.liboshuai.framework.utils.SpUtils;
 import com.tencent.bugly.crashreport.CrashReport;
 
+import org.litepal.LitePal;
+
 /**
  * Author:boshuai.li
  * Time:2020/3/16   16:31
@@ -40,6 +42,6 @@ public class Framework {
         BmobManager.getInstance().initBmob(context);
         CrashReport.initCrashReport(context, "3f29febdac", true);
         CloudManager.getInstance().init(context);
-
+        LitePal.initialize(context);
     }
 }

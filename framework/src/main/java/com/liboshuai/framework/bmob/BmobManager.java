@@ -175,6 +175,16 @@ public class BmobManager {
     }
 
     /**
+     * 查询我的好友
+     */
+    public void queryMyFriend(FindListener<Friend> listener) {
+        BmobQuery<Friend> objectBmobQuery = new BmobQuery<>();
+        // 添加 查询条件
+        objectBmobQuery.addWhereEqualTo("user", getUser());
+        objectBmobQuery.findObjects(listener);
+    }
+
+    /**
      * 上传头像的回调
      */
     public interface UploadPhotoListener {
