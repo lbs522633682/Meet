@@ -9,13 +9,17 @@
 
     3. 发送添加好友的消息
 
-    4. 接受添加好友的消息
+    4. 接受添加好友的消息 
 
     5. 使用本地数据库，存储好友关系
 
         LitePal 数据库集成
 
         https://github.com/guolindev/LitePal
+
+    6. 创建接收好友添加的消息 并展示效果
+
+    7. 处理重复请求添加好友的信息
 
 ## EventBus的事件栈
 
@@ -24,6 +28,27 @@
 ### EventBus 四面八方都来消息，怎么区分？
 
     可以在messageEvent中定义一个type 进行区分 消息类别
+
+## 问题
+
+Caused by: android.view.InflateException: You must specifiy a layout in the include tag: <include layout="@layout/layoutID" />
+
+    错误写法
+
+    <include
+            android:id="@+id/item_empty_view"
+            android:visibility="gone"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout="@layout/layout_empty_view" />
+
+    正确写法：（layout前不需要android标签）
+    <include
+            android:id="@+id/item_empty_view"
+            android:visibility="gone"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            layout="@layout/layout_empty_view" />
 
 
 

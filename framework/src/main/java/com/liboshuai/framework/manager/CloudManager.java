@@ -28,7 +28,7 @@ public class CloudManager {
     public static final String CLOUD_KEY = "25wehl3u20a0w";
 
     // ObjectName
-    public static final String MSG_TEXT_NAME = "RC:TXTMsg";
+    public static final String MSG_TEXT_NAME = "RC:TxtMsg";
     public static final String MSG_IMAGE_NAME = "RC:ImgMsg";
     public static final String MSG_LOCATION_NAME = "RC:LBSMsg";
 

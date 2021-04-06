@@ -9,12 +9,17 @@ import org.litepal.crud.LitePalSupport;
  */
 public class NewFriend extends LitePalSupport {
 
+    public static final int STATUS_NOT_CONFIRM = -1;
+    public static final int STATUS_AGREE = 0;
+    public static final int STATUS_REFUSED = 1;
+
+
     // 留言
     private String msg;
     private String userId;
     private long saveTime;
     // 状态：-1 待确认 0 同意 1 拒绝
-    private int isAgree = -1;
+    private int isAgree = STATUS_NOT_CONFIRM;
 
     public String getMsg() {
         return msg;

@@ -14,6 +14,7 @@ import com.liboshuai.framework.helper.GlideHelper;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import plat.skytv.client.meet.R;
+import plat.skytv.client.meet.ui.NewFriendActivity;
 
 /**
  * Author:boshuai.li
@@ -79,6 +80,7 @@ public class MeFragment extends BaseFragment implements View.OnClickListener {
             case R.id.ll_me_info:
                 break;
             case R.id.ll_new_friend:
+                NewFriendActivity.startActivity(getActivity());
                 break;
             case R.id.ll_private_set:
                 break;

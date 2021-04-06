@@ -40,6 +40,10 @@
         <activity
             android:name=".ui.AddFriendActivity"
             android:launchMode="singleTask" />
+
+        <activity
+            android:name=".ui.NewFriendActivity"
+            android:launchMode="singleTask" />
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
