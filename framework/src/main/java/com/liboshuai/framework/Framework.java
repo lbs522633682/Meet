@@ -7,6 +7,7 @@ import com.liboshuai.framework.manager.CloudManager;
 import com.liboshuai.framework.utils.SpUtils;
 import com.tencent.bugly.crashreport.CrashReport;
 
+import org.greenrobot.eventbus.EventBus;
 import org.litepal.LitePal;
 
 /**

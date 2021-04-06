@@ -15,7 +15,16 @@
 
         LitePal 数据库集成
 
+        https://github.com/guolindev/LitePal
+
 ## EventBus的事件栈
+
+    https://github.com/greenrobot/EventBus
+
+### EventBus 四面八方都来消息，怎么区分？
+
+    可以在messageEvent中定义一个type 进行区分 消息类别
+
 
 
 -----------------------------------20210402---------------------------

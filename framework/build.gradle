@@ -55,6 +55,7 @@ dependencies {
     api rootProject.ext.dependencies["tagcloud"]
     api rootProject.ext.dependencies["glide"]
     api rootProject.ext.dependencies["litepal"]
+    api rootProject.ext.dependencies["eventbus"]
     api project(path: ':IMLib')
 
 }

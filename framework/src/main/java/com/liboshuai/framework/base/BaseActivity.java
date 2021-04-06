@@ -5,11 +5,20 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.liboshuai.framework.event.EventManager;
+import com.liboshuai.framework.event.MessageEvent;
 import com.liboshuai.framework.utils.LogUtils;
+import com.liboshuai.framework.utils.ToastUtil;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +58,24 @@ public class BaseActivity extends AppCompatActivity {
     private OnPermissionResult permissionResult;
     // 回调code
     private int requestCode;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventManager.register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventManager.unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        /* Do something */
+        ToastUtil.showTextToast(this, "EventBus 接收消息");
+    }
 
     /**
      * 封装方法
