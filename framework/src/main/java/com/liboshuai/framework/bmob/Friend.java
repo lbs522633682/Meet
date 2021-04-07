@@ -2,12 +2,14 @@ package com.liboshuai.framework.bmob;
 
 import com.liboshuai.framework.utils.JsonUtil;
 
+import cn.bmob.v3.BmobObject;
+
 /**
  * Author:boshuai.li
  * Time:2021/4/6   15:00
  * Description: 朋友
  */
-public class Friend {
+public class Friend extends BmobObject {
     // 我自己
     private IMUser user;
 

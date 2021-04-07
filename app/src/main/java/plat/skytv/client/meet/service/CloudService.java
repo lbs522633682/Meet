@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.db.LitepalHelper;
 import com.liboshuai.framework.db.NewFriend;
 import com.liboshuai.framework.entity.Consts;
@@ -14,6 +15,8 @@ import com.liboshuai.framework.utils.SpUtils;
 
 import java.util.List;
 
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
 import gson.TextBean;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -117,6 +120,15 @@ public class CloudService extends Service {
 
                     } else if (CloudManager.TYPE_AGREED_FRIEND.equals(textBean.getType())) {
                         // 同意添加好友消息
+                        // 1. 添加到好友列表
+                        BmobManager.getInstance().addFriend(message.getSenderUserId(), new SaveListener<String>() {
+                            @Override
+                            public void done(String s, BmobException e) {
+                                if (e == null) {
+                                    // 2. 刷新好友列表
+                                }
+                            }
+                        });
                     } else {
                         // 未知消息类型
                     }

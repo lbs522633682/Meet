@@ -1,10 +1,12 @@
 package com.liboshuai.framework.bmob;
 
 import android.content.Context;
+import android.icu.util.Freezable;
 
 import com.liboshuai.framework.utils.LogUtils;
 
 import java.io.File;
+import java.util.List;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
@@ -205,6 +207,7 @@ public class BmobManager {
 
     /**
      * 根据 userid 查询用户信息
+     *
      * @param userId
      * @param listener
      */
@@ -224,5 +227,39 @@ public class BmobManager {
         BmobQuery<IMUser> objectBmobQuery = new BmobQuery<>();
         objectBmobQuery.addWhereEqualTo(key, value);
         objectBmobQuery.findObjects(listener);
+    }
+
+    /**
+     * 将朋友添加到我的数据库
+     *
+     * @param imUser   朋友用户
+     * @param listener
+     */
+    public void addFriend(IMUser imUser, SaveListener<String> listener) {
+        Friend friend = new Friend();
+        friend.setUser(getUser());
+        friend.setFriendUser(imUser);
+        friend.save(listener);
+    }
+
+    /**
+     * 通过id查询用户，添加好友
+     *
+     * @param userid
+     * @param listener
+     */
+    public void addFriend(String userid, final SaveListener<String> listener) {
+        queryObjectIdUser(userid, new FindListener<IMUser>() {
+            @Override
+            public void done(List<IMUser> list, BmobException e) {
+
+                if (e == null) {
+                    if (list != null && list.size() > 0) {
+                        IMUser imUser = list.get(0);
+                        addFriend(imUser, listener);
+                    }
+                }
+            }
+        });
     }
 }

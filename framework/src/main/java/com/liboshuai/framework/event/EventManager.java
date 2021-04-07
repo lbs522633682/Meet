@@ -9,6 +9,9 @@ import org.greenrobot.eventbus.EventBus;
  */
 public class EventManager {
 
+    // 刷新好友列表
+    public static final int FLAG_UPDATE_FRIEND_LIST = 1000;
+
     /**
      * Event 的步骤
      * 1. 注册
