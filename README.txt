@@ -1,5 +1,28 @@
 
 开发日志 思考每一个遇到的问题
+
+-----------------------------------20210408---------------------------
+## 会话管理
+
+    1. 官方文档
+        https://docs.rongcloud.cn/v4/views/im/noui/guide/private/conversation/getall/android.html
+
+    2. tablayout 和viewpage的联动 
+
+        ？？ BEHAVIOR_SET_USER_VISIBLE_HINT, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT}
+
+    3. SwipeRefreshLayout
+
+        androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+
+    4. Conversation api
+
+        https://www.rongcloud.cn/docs/api/android/imlib_v4/
+
+## 全部好友列表
+
+    1. 
+
 -----------------------------------20210407---------------------------
 ## 已完成
 

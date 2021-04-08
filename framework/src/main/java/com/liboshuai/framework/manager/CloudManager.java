@@ -7,6 +7,8 @@ import com.liboshuai.framework.utils.LogUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
@@ -166,5 +168,13 @@ public class CloudManager {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取会话记录
+     * @param callback
+     */
+    public void getConversationList(RongIMClient.ResultCallback<List<Conversation>> callback) {
+        RongIMClient.getInstance().getConversationList(callback);
     }
 }
