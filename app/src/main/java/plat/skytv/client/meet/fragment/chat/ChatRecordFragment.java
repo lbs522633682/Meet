@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +15,6 @@ import com.liboshuai.framework.adapter.CommonViewHolder;
 import com.liboshuai.framework.base.BaseFragment;
 import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.bmob.IMUser;
-import com.liboshuai.framework.helper.GlideHelper;
 import com.liboshuai.framework.manager.CloudManager;
 import com.liboshuai.framework.utils.JsonUtil;
 import com.liboshuai.framework.utils.LogUtils;
@@ -33,7 +31,6 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.message.TextMessage;
 import plat.skytv.client.meet.R;
-import plat.skytv.client.meet.adapter.AddFriendAdapter;
 import plat.skytv.client.meet.model.ChatRecordModel;
 
 /**
@@ -44,7 +41,7 @@ import plat.skytv.client.meet.model.ChatRecordModel;
 public class ChatRecordFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private SwipeRefreshLayout mAllFriendRefreshLayout;
-    private RecyclerView mAllFriendView;
+    private RecyclerView mChatRecordView;
     private View item_empty_view;
     private CommonAdapter<ChatRecordModel> mChatRecordAdapter;
 
@@ -62,13 +59,13 @@ public class ChatRecordFragment extends BaseFragment implements SwipeRefreshLayo
         mLoadingView = new LoadingView(getActivity());
         mLoadingView.setLoadingText("正在加载...");
         mAllFriendRefreshLayout = view.findViewById(R.id.mAllFriendRefreshLayout);
-        mAllFriendView = view.findViewById(R.id.mAllFriendView);
+        mChatRecordView = view.findViewById(R.id.mAllFriendView);
         item_empty_view = view.findViewById(R.id.item_empty_view);
 
         mAllFriendRefreshLayout.setOnRefreshListener(this);
 
-        mAllFriendView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAllFriendView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        mChatRecordView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mChatRecordView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         mChatRecordAdapter = new CommonAdapter<>(mList, new CommonAdapter.OnBindDataListener<ChatRecordModel>() {
             @Override
             public void onBindViewHolder(ChatRecordModel model, CommonViewHolder viewHolder, int type, int position) {
@@ -89,7 +86,7 @@ public class ChatRecordFragment extends BaseFragment implements SwipeRefreshLayo
                 return R.layout.layout_chat_record_item;
             }
         });
-        mAllFriendView.setAdapter(mChatRecordAdapter);
+        mChatRecordView.setAdapter(mChatRecordAdapter);
 
         // 查询聊天记录
         queryChatRecord();
@@ -151,10 +148,10 @@ public class ChatRecordFragment extends BaseFragment implements SwipeRefreshLayo
                                             LogUtils.i("queryChatRecord queryObjectIdUser 未知类型消息");
                                         }
                                         if (mList.size() > 0) {
-                                            mAllFriendView.setVisibility(View.VISIBLE);
+                                            mChatRecordView.setVisibility(View.VISIBLE);
                                             item_empty_view.setVisibility(View.GONE);
                                         } else {
-                                            mAllFriendView.setVisibility(View.GONE);
+                                            mChatRecordView.setVisibility(View.GONE);
                                             item_empty_view.setVisibility(View.VISIBLE);
                                         }
                                         mChatRecordAdapter.notifyDataSetChanged();
@@ -165,7 +162,7 @@ public class ChatRecordFragment extends BaseFragment implements SwipeRefreshLayo
                     }
                 } else {
                     mLoadingView.hide();
-                    mAllFriendView.setVisibility(View.GONE);
+                    mChatRecordView.setVisibility(View.GONE);
                     item_empty_view.setVisibility(View.VISIBLE);
                 }
             }
