@@ -8,11 +8,20 @@ import com.liboshuai.framework.utils.JsonUtil;
  * Description:全部好友得数据模型
  */
 public class AllFriendModel {
+    private String userId; // 用户得id
     private String url;
     private String nickName;
     private String desc;
     // true 男 ，false 女
     private boolean sex;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getUrl() {
         return url;

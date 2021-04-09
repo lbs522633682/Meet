@@ -8,6 +8,8 @@ import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.db.LitepalHelper;
 import com.liboshuai.framework.db.NewFriend;
 import com.liboshuai.framework.entity.Consts;
+import com.liboshuai.framework.event.EventManager;
+import com.liboshuai.framework.event.MessageEvent;
 import com.liboshuai.framework.manager.CloudManager;
 import com.liboshuai.framework.utils.JsonUtil;
 import com.liboshuai.framework.utils.LogUtils;
@@ -40,6 +42,7 @@ import io.rong.message.TextMessage;
 public class CloudService extends Service {
 
     private Disposable disposable;
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -79,58 +82,64 @@ public class CloudService extends Service {
                     String content = textMessage.getContent();
                     LogUtils.i("linkCloudServer onReceived  content = " + content);
                     TextBean textBean = JsonUtil.parseObject(content, TextBean.class);
-                    // 普通消息
-                    if (CloudManager.TYPE_TEXT.equals(textBean.getType())) {
 
-                    } else if (CloudManager.TYPE_ADD_FRIEND.equals(textBean.getType())) {
-                        // 添加好友消息
-                        LogUtils.i("添加好友消息");
-                        // 再添加数据库之前查询，如果重复则不添加
-                        disposable = Observable.create(new ObservableOnSubscribe<List<NewFriend>>() { // 创建一个发射器
-                            @Override
-                            public void subscribe(@NonNull ObservableEmitter<List<NewFriend>> emitter) throws Exception { // 在发射器中执行 操作
-                                List<NewFriend> newFriends = LitepalHelper.getInstance().queryNewFriend();
-                                LogUtils.i("linkCloudServer queryNewFriend newFriends = " + newFriends);
-                                emitter.onNext(newFriends);
-                                emitter.onComplete();
-                            }
-                        }).subscribeOn(Schedulers.newThread()) // 执行线程
-                                .observeOn(AndroidSchedulers.mainThread()) // 订阅线程
-                                .subscribe(new Consumer<List<NewFriend>>() { // 创建接收器，接受结果
-                                    @Override
-                                    public void accept(List<NewFriend> newFriends) throws Exception {
-                                        boolean isHave = false; // 是否在数据库中找到
-                                        if (newFriends != null && newFriends.size() > 0) {
-                                            for (int j = 0; j < newFriends.size(); j++) {
-                                                NewFriend newFriend = newFriends.get(j);
-                                                if (newFriend.getUserId().equals(message.getSenderUserId())) {
-                                                    isHave = true;
-                                                    break;
+                    if (textBean != null) {
+                        // 普通消息
+                        if (CloudManager.TYPE_TEXT.equals(textBean.getType())) {
+                            MessageEvent messageEvent = new MessageEvent(EventManager.FLAG_SEND_TEXT);
+                            messageEvent.setText(textBean.getMsg());
+                            messageEvent.setUserId(message.getSenderUserId());
+                            EventManager.post(messageEvent);
+                        } else if (CloudManager.TYPE_ADD_FRIEND.equals(textBean.getType())) {
+                            // 添加好友消息
+                            LogUtils.i("添加好友消息");
+                            // 再添加数据库之前查询，如果重复则不添加
+                            disposable = Observable.create(new ObservableOnSubscribe<List<NewFriend>>() { // 创建一个发射器
+                                @Override
+                                public void subscribe(@NonNull ObservableEmitter<List<NewFriend>> emitter) throws Exception { // 在发射器中执行 操作
+                                    List<NewFriend> newFriends = LitepalHelper.getInstance().queryNewFriend();
+                                    LogUtils.i("linkCloudServer queryNewFriend newFriends = " + newFriends);
+                                    emitter.onNext(newFriends);
+                                    emitter.onComplete();
+                                }
+                            }).subscribeOn(Schedulers.newThread()) // 执行线程
+                                    .observeOn(AndroidSchedulers.mainThread()) // 订阅线程
+                                    .subscribe(new Consumer<List<NewFriend>>() { // 创建接收器，接受结果
+                                        @Override
+                                        public void accept(List<NewFriend> newFriends) throws Exception {
+                                            boolean isHave = false; // 是否在数据库中找到
+                                            if (newFriends != null && newFriends.size() > 0) {
+                                                for (int j = 0; j < newFriends.size(); j++) {
+                                                    NewFriend newFriend = newFriends.get(j);
+                                                    if (newFriend.getUserId().equals(message.getSenderUserId())) {
+                                                        isHave = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
+                                            if (!isHave) {
+                                                LogUtils.i("保存添加好友信息");
+                                                // BMOB 和 rongCloud 都没有提供存储方法
+                                                // 使用另外的方法存入本地数据库
+                                                LitepalHelper.getInstance().saveNewFriend(textBean.getMsg(), message.getSenderUserId());
+                                            }
                                         }
-                                        if (!isHave) {
-                                            LogUtils.i("保存添加好友信息");
-                                            // BMOB 和 rongCloud 都没有提供存储方法
-                                            // 使用另外的方法存入本地数据库
-                                            LitepalHelper.getInstance().saveNewFriend(textBean.getMsg(), message.getSenderUserId());
-                                        }
-                                    }
-                                });
+                                    });
 
-                    } else if (CloudManager.TYPE_AGREED_FRIEND.equals(textBean.getType())) {
-                        // 同意添加好友消息
-                        // 1. 添加到好友列表
-                        BmobManager.getInstance().addFriend(message.getSenderUserId(), new SaveListener<String>() {
-                            @Override
-                            public void done(String s, BmobException e) {
-                                if (e == null) {
-                                    // 2. 刷新好友列表
+                        } else if (CloudManager.TYPE_AGREED_FRIEND.equals(textBean.getType())) {
+                            // 同意添加好友消息
+                            // 1. 添加到好友列表
+                            BmobManager.getInstance().addFriend(message.getSenderUserId(), new SaveListener<String>() {
+                                @Override
+                                public void done(String s, BmobException e) {
+                                    if (e == null) {
+                                        // 2. 刷新好友列表
+                                    }
                                 }
-                            }
-                        });
-                    } else {
-                        // 未知消息类型
+                            });
+                        } else {
+                            // 未知消息类型
+                        }
                     }
                 }
 

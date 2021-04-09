@@ -40,6 +40,9 @@
         <activity
             android:name=".ui.AddFriendActivity"
             android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.ChatActivity"
+            android:launchMode="singleTask" />
 
         <activity
             android:name=".ui.NewFriendActivity"

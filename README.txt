@@ -1,6 +1,21 @@
 
 开发日志 思考每一个遇到的问题
 
+-----------------------------------20210409---------------------------
+## 全部好友列表
+
+    1. item 点击跳转到user InfoActivity
+
+    2. ChatActivity的UI填充
+
+    3. ChatFragment 的数据填充
+
+        获取历史消息：https://docs.rongcloud.cn/v4/views/im/noui/guide/private/msgmanage/storage/android.html
+
+    4. ChatActivity 完成 消息发送 并展示
+
+    5. ChatActivity 完成 文字聊天功能
+
 -----------------------------------20210408---------------------------
 ## 会话管理
 

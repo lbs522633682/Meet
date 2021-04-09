@@ -96,6 +96,9 @@ public class UserInfoActivity extends BaseBackActivity implements View.OnClickLi
 
     private String userId = "";
 
+    // 当前正在展示得用户
+    private IMUser imUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,7 +176,7 @@ public class UserInfoActivity extends BaseBackActivity implements View.OnClickLi
             public void done(List<IMUser> list, BmobException e) {
                 if (e == null) {
                     if (list != null && list.size() > 0) {
-                        IMUser imUser = list.get(0);
+                        imUser = list.get(0);
                         updateUserInfo(imUser);
                     }
                 }
@@ -236,7 +239,9 @@ public class UserInfoActivity extends BaseBackActivity implements View.OnClickLi
                 DialogManager.getInstance().show(mAddFriendDialog);
                 break;
             case R.id.btn_chat:
-
+                if (imUser != null) {
+                    ChatActivity.startActivity(this, imUser.getObjectId(), imUser.getNickName(), imUser.getPhoto());
+                }
                 break;
             case R.id.btn_audio_chat:
 

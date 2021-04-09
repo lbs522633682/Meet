@@ -34,7 +34,7 @@ public class CloudManager {
     public static final String MSG_IMAGE_NAME = "RC:ImgMsg";
     public static final String MSG_LOCATION_NAME = "RC:LBSMsg";
 
-    // msgType
+    // Textbean msgType
     // 普通消息
     public static final String TYPE_TEXT = "TYPE_TEXT";
     // 添加好友的消息
@@ -95,7 +95,7 @@ public class CloudManager {
             public void onSuccess(String s) {
                 LogUtils.i("connect s = " + s);
                 // 测试消息 发送
-                CloudManager.getInstance().sendTextMessage("很高兴认识你", "b757a3c83d");
+                //CloudManager.getInstance().sendTextMessage("很高兴认识你", "b757a3c83d");
             }
 
             @Override
@@ -139,7 +139,7 @@ public class CloudManager {
      * @param message
      * @param targetId
      */
-    public void sendTextMessage(String message, String targetId) {
+    private void sendTextMessage(String message, String targetId) {
         /*public void sendMessage(Conversation.ConversationType type, String targetId, MessageContent
         content, String pushContent, String pushData, IRongCallback.ISendMessageCallback callback) {*/
         TextMessage textMessage = TextMessage.obtain(message);
@@ -172,9 +172,39 @@ public class CloudManager {
 
     /**
      * 获取会话记录
+     *
      * @param callback
      */
     public void getConversationList(RongIMClient.ResultCallback<List<Conversation>> callback) {
         RongIMClient.getInstance().getConversationList(callback);
+    }
+
+    /**
+     * 获取与目标用户的历史聊天记录
+     *
+     * @param targetId
+     * @param callback
+     */
+    public void getHistoryMessages(String targetId, RongIMClient.ResultCallback<List<Message>> callback) {
+        RongIMClient.getInstance().getHistoryMessages(Conversation.ConversationType.PRIVATE,
+                targetId,
+                -1,
+                1000,
+                callback);
+    }
+
+    /**
+     * 从远程服务器拉取与对方的 聊天记录
+     *
+     * @param targetId
+     * @param callback
+     */
+    public void getRemoteHistoryMessages(String targetId, RongIMClient.ResultCallback<List<Message>> callback) {
+        RongIMClient.getInstance().getRemoteHistoryMessages(Conversation.ConversationType.PRIVATE,
+                targetId,
+                0,
+                20,
+                callback);
+
     }
 }

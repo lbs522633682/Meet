@@ -26,6 +26,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import plat.skytv.client.meet.R;
 import plat.skytv.client.meet.model.AllFriendModel;
+import plat.skytv.client.meet.ui.UserInfoActivity;
 
 /**
  * Author:boshuai.li
@@ -68,7 +69,12 @@ public class AllFriendFragment extends BaseFragment implements SwipeRefreshLayou
                 viewHolder.setImageResource(R.id.iv_sex, model.isSex() ? R.drawable.img_boy_icon : R.drawable.img_girl_icon);
                 viewHolder.setText(R.id.tv_nickname, model.getNickName());
                 viewHolder.setText(R.id.tv_desc, model.getDesc());
-
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        UserInfoActivity.startActivity(getActivity(), model.getUserId());
+                    }
+                });
             }
 
             @Override
@@ -135,6 +141,7 @@ public class AllFriendFragment extends BaseFragment implements SwipeRefreshLayou
                             allFriendModel.setNickName(imUser.getNickName());
                             allFriendModel.setSex(imUser.isSex());
                             allFriendModel.setUrl(imUser.getPhoto());
+                            allFriendModel.setUserId(imUser.getObjectId());
                             mList.add(allFriendModel);
                             mAllFriendAdapter.notifyDataSetChanged();
                         }
