@@ -1,6 +1,22 @@
 
 开发日志 思考每一个遇到的问题
+-----------------------------------20210410---------------------------
 
+## 发送图片消息
+    1. 读取 相机、相册图片
+
+    2. 发送图片信息 
+        https://docs.rongcloud.cn/v4/views/im/ui/guide/private/conversation/msgsend/android.html#image
+
+    3. photoview预览 主要是图片的预览
+
+        https://github.com/Baseflow/PhotoView 
+
+## 问题
+
+    1. 已读得消息 获取 getUnreadMessageCount 不对
+
+        https://docs.rongcloud.cn/v4/views/im/noui/guide/group/conversation/unreadcount/android.html
 -----------------------------------20210409---------------------------
 ## 全部好友列表
 
@@ -427,6 +443,10 @@ circleimageview?
     </animation-list>
 
 -----------------------------------20200320---------------------------
+## Git 拉取远程仓库 并关联
+    https://blog.csdn.net/Dakaring/article/details/45742987?utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-3.baidujs&dist_request_id=&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-3.baidujs
+
+    创建复制令牌登录：https://blog.csdn.net/qq_46128318/article/details/111544246
 ## Git忽略某些不重要的文件
 
     1.在Git工作区的根目录下创建一个特殊的.gitignore文件，

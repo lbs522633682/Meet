@@ -1,12 +1,14 @@
 package com.liboshuai.framework.manager;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.liboshuai.framework.utils.LogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.List;
 
 import io.rong.imlib.IRongCallback;
@@ -14,6 +16,7 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
+import io.rong.message.ImageMessage;
 import io.rong.message.TextMessage;
 
 /**
@@ -168,6 +171,64 @@ public class CloudManager {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private RongIMClient.SendImageMessageCallback sendImageMessageCallback = new RongIMClient.SendImageMessageCallback() {
+        /**
+         * 消息发送前回调, 回调时消息已存储数据库
+         * @param message 已存库的消息体
+         */
+        @Override
+        public void onAttached(Message message) {
+
+        }
+        /**
+         * 消息发送成功
+         * @param message 发送成功后的消息体
+         */
+        @Override
+        public void onSuccess(Message message) {
+            LogUtils.i("sendImageMessage onSuccess message = " + message);
+        }
+
+        /**
+         * 消息发送失败
+         * @param message   发送失败的消息体
+         * @param errorCode 具体的错误
+         */
+        @Override
+        public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+            LogUtils.i("sendImageMessage onError message = " + message + ", errorCode = " + errorCode);
+        }
+
+        /**
+         * 上传进度
+         * @param message  发送的消息实体
+         * @param progress 进度值: 0 - 100
+         */
+        @Override
+        public void onProgress(Message message, int progress) {
+            LogUtils.i("sendImageMessage message = " + message + ", progress = " + progress);
+        }
+    };
+
+    /**
+     * 发送图片消息
+     * @param targetId 对方的id
+     * @param imgFile 图片文件
+     */
+    public void sendImageMessage(String targetId, File imgFile) {
+        // 1. 仅支持本地图片
+        // 2. 图片地址需以 `file://` 开头, 不是以 `file://` 开头的需拼接
+        //String path = "file://图片的路径";
+        //Uri localUri = Uri.parse(path);
+        ImageMessage imageMessage = ImageMessage.obtain(null, Uri.fromFile(imgFile));
+        RongIMClient.getInstance().sendImageMessage(Conversation.ConversationType.PRIVATE,
+                targetId, imageMessage,
+                null,
+                null,
+                sendImageMessageCallback);
+
     }
 
     /**

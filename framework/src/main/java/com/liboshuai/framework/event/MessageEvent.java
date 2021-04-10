@@ -14,8 +14,21 @@ public class MessageEvent {
      */
     private int type;
 
-    private String text;
     private String userId;
+
+    // 文本内容
+    private String text;
+
+    // 图片链接
+    private String imgUrl;
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
 
     public int getType() {
         return type;

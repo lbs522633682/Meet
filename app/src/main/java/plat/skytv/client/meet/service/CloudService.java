@@ -3,6 +3,7 @@ package plat.skytv.client.meet.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.text.TextUtils;
 
 import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.db.LitepalHelper;
@@ -31,6 +32,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
+import io.rong.message.ImageMessage;
 import io.rong.message.TextMessage;
 
 
@@ -141,6 +143,19 @@ public class CloudService extends Service {
                             // 未知消息类型
                         }
                     }
+                } else if (CloudManager.MSG_IMAGE_NAME.equals(objectName)) { // 图片消息接收
+                    ImageMessage imageMessage = (ImageMessage) message.getContent();
+                    String imgUrl = imageMessage.getRemoteUri().toString();
+                    LogUtils.i("接收到图片消息，url = " + imgUrl);
+                    if (!TextUtils.isEmpty(imgUrl)) {
+                        // 发送 messageEvent
+                        MessageEvent messageEvent = new MessageEvent(EventManager.FLAG_SEND_IMAGE);
+                        messageEvent.setImgUrl(imgUrl);
+                        messageEvent.setUserId(message.getSenderUserId());
+                        EventManager.post(messageEvent);
+                    }
+                } else if (CloudManager.MSG_LOCATION_NAME.equals(objectName)) { // 位置消息
+
                 }
 
                 return false;

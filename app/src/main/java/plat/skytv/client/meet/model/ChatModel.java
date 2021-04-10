@@ -2,6 +2,8 @@ package plat.skytv.client.meet.model;
 
 import com.liboshuai.framework.utils.JsonUtil;
 
+import java.io.File;
+
 /**
  * Author:boshuai.li
  * Time:2021/4/9
@@ -29,8 +31,29 @@ public class ChatModel {
     // 文本消息
     private String text;
 
+    // 图片消息
+    private String imgUrl;
+    // 图片消息 本地图片
+    private File localFile;
+
     // TODO 其他类型消息
 
+
+    public File getLocalFile() {
+        return localFile;
+    }
+
+    public void setLocalFile(File localFile) {
+        this.localFile = localFile;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
 
     public int getType() {
         return type;

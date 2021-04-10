@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.liboshuai.framework.helper.GlideHelper;
 
+import java.io.File;
+
 /**
  * Author:boshuai.li
  * Time:2020/7/28   16:20
@@ -79,6 +81,20 @@ public class CommonViewHolder extends RecyclerView.ViewHolder {
     public CommonViewHolder setImageUrl(Context context, int viewId, String url) {
         ImageView iv = getView(viewId);
         GlideHelper.loadUrl(context, url, iv);
+        return this;
+    }
+
+    /**
+     * 设置图片 文件
+     *
+     * @param context
+     * @param viewId
+     * @param imgFile
+     * @return
+     */
+    public CommonViewHolder setImageFile(Context context, int viewId, File imgFile) {
+        ImageView iv = getView(viewId);
+        GlideHelper.loadUrl(context, imgFile, iv);
         return this;
     }
 

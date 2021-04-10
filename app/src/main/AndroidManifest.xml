@@ -41,6 +41,9 @@
             android:name=".ui.AddFriendActivity"
             android:launchMode="singleTask" />
         <activity
+            android:name=".ui.ImagePreviewActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
             android:name=".ui.ChatActivity"
             android:launchMode="singleTask" />
 

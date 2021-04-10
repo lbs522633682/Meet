@@ -32,6 +32,7 @@ import io.rong.imlib.model.Conversation;
 import io.rong.message.TextMessage;
 import plat.skytv.client.meet.R;
 import plat.skytv.client.meet.model.ChatRecordModel;
+import plat.skytv.client.meet.ui.ChatActivity;
 
 /**
  * Author:boshuai.li
@@ -79,6 +80,13 @@ public class ChatRecordFragment extends BaseFragment implements SwipeRefreshLayo
                     viewHolder.getView(R.id.tv_un_read).setVisibility(View.VISIBLE);
                     viewHolder.setText(R.id.tv_un_read, model.getUnReadSize() + "");
                 }
+
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ChatActivity.startActivity(getActivity(), model.getUserId(), model.getNickName(), model.getUrl());
+                    }
+                });
             }
 
             @Override
@@ -89,7 +97,7 @@ public class ChatRecordFragment extends BaseFragment implements SwipeRefreshLayo
         mChatRecordView.setAdapter(mChatRecordAdapter);
 
         // 查询聊天记录
-        queryChatRecord();
+        // queryChatRecord();
     }
 
     private void queryChatRecord() {
@@ -119,11 +127,13 @@ public class ChatRecordFragment extends BaseFragment implements SwipeRefreshLayo
                                         IMUser imUser = list.get(0);
                                         ChatRecordModel chatRecordModel = new ChatRecordModel();
 
+                                        chatRecordModel.setUserId(imUser.getObjectId());
+
                                         chatRecordModel.setNickName(imUser.getNickName());
                                         chatRecordModel.setUrl(imUser.getPhoto());
                                         chatRecordModel.setTime(new SimpleDateFormat("HH:mm:ss")
                                                 .format(conversation.getReceivedTime()));
-                                        // 设置未读信息数
+                                        // TODO 设置未读信息数
                                         chatRecordModel.setUnReadSize(conversation.getUnreadMessageCount());
 
                                         // 判断消息类型
@@ -185,5 +195,12 @@ public class ChatRecordFragment extends BaseFragment implements SwipeRefreshLayo
         if (mAllFriendRefreshLayout.isRefreshing()) {
             queryChatRecord();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 回到界面刷新ui
+        queryChatRecord();
     }
 }

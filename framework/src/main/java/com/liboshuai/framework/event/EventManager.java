@@ -15,6 +15,8 @@ public class EventManager {
     // 发送文本消息
     public static final int FLAG_SEND_TEXT = 1001;
 
+    // 发送图片消息
+    public static final int FLAG_SEND_IMAGE = 1002;
     /**
      * Event 的步骤
      * 1. 注册
