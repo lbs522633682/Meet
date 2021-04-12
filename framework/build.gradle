@@ -57,6 +57,10 @@ dependencies {
     api rootProject.ext.dependencies["litepal"]
     api rootProject.ext.dependencies["eventbus"]
     api rootProject.ext.dependencies["photoview"]
+
+    api rootProject.ext.dependencies["3dmap"]
+    api rootProject.ext.dependencies["location"]
+    api rootProject.ext.dependencies["search"]
     api project(path: ':IMLib')
 
 }

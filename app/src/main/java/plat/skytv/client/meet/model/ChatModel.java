@@ -36,8 +36,43 @@ public class ChatModel {
     // 图片消息 本地图片
     private File localFile;
 
-    // TODO 其他类型消息
+    // 位置消息
+    private double la;
+    private double lo;
+    private String address;
+    private String mapUrl;
 
+    public double getLa() {
+        return la;
+    }
+
+    public void setLa(double la) {
+        this.la = la;
+    }
+
+    public double getLo() {
+        return lo;
+    }
+
+    public void setLo(double lo) {
+        this.lo = lo;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getMapUrl() {
+        return mapUrl;
+    }
+
+    public void setMapUrl(String mapUrl) {
+        this.mapUrl = mapUrl;
+    }
 
     public File getLocalFile() {
         return localFile;

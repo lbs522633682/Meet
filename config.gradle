@@ -26,6 +26,9 @@ ext {
             "litepal"        : 'org.litepal.android:java:3.0.0',
             "eventbus"       : 'org.greenrobot:eventbus:3.2.0',
             "photoview"      : 'com.github.chrisbanes:PhotoView:2.3.0',
+            "3dmap"          : 'com.amap.api:3dmap:5.0.0',
+            "location"       : 'com.amap.api:location:3.3.0',
+            "search"         : 'com.amap.api:search:5.0.0',
 
     ]
 

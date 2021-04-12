@@ -23,6 +23,7 @@ import com.liboshuai.framework.event.EventManager;
 import com.liboshuai.framework.event.MessageEvent;
 import com.liboshuai.framework.helper.FileHelper;
 import com.liboshuai.framework.manager.CloudManager;
+import com.liboshuai.framework.manager.MapManager;
 import com.liboshuai.framework.utils.JsonUtil;
 import com.liboshuai.framework.utils.LogUtils;
 
@@ -38,6 +39,7 @@ import gson.TextBean;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Message;
 import io.rong.message.ImageMessage;
+import io.rong.message.LocationMessage;
 import io.rong.message.TextMessage;
 import plat.skytv.client.meet.R;
 import plat.skytv.client.meet.model.ChatModel;
@@ -66,6 +68,16 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
      * 3. 完成适配器填充
      * 4. 完成service的图片接受
      * 5. 通知ui刷新图片
+     */
+
+    /**
+     * 发送地址的逻辑
+     * 1. 获取地址
+     * 2. 发送位置消息
+     * 不能忘记：
+     * 1. 历史消息
+     * 2. 适配器
+     * 3. 发送消息
      */
 
     /**
@@ -111,6 +123,7 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
     private CommonAdapter<ChatModel> mChatAdapter;
     private Context mContext;
     private File mImgFile; // 选中 待发送得图片文件
+    private int LOCATION_REQUEST_CODE = 1888;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +146,7 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
 
         ll_camera.setOnClickListener(this);
         ll_pic.setOnClickListener(this);
+        ll_location.setOnClickListener(this);
 
         mChatAdapter = new CommonAdapter<>(mList, new CommonAdapter.OnMoreBindDataListener<ChatModel>() {
             @Override
@@ -183,7 +197,37 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
                         }
                     });
                 } else if (ChatModel.TYPE_LEFT_LOCATION == model.getType()) {
+                    viewHolder.setImageUrl(mContext, R.id.iv_left_photo, yourUserPhoto);
+                    viewHolder.setImageUrl(mContext, R.id.iv_left_location_img, model.getMapUrl());
+                    viewHolder.setText(R.id.tv_left_address, model.getAddress());
+
+                    viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            LocationActivity.startActivity(ChatActivity.this,
+                                    false,
+                                    model.getLa(),
+                                    model.getLo(),
+                                    model.getAddress(),
+                                    LOCATION_REQUEST_CODE);
+                        }
+                    });
+
                 } else if (ChatModel.TYPE_RIGHT_LOCATION == model.getType()) {
+                    viewHolder.setImageUrl(mContext, R.id.iv_right_photo, myPhoto);
+                    viewHolder.setImageUrl(mContext, R.id.iv_right_location_img, model.getMapUrl());
+                    viewHolder.setText(R.id.tv_right_address, model.getAddress());
+                    viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            LocationActivity.startActivity(ChatActivity.this,
+                                    false,
+                                    model.getLa(),
+                                    model.getLo(),
+                                    model.getAddress(),
+                                    LOCATION_REQUEST_CODE);
+                        }
+                    });
                 }
             }
 
@@ -277,7 +321,13 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
                     }
                 }
             } else if (CloudManager.MSG_LOCATION_NAME.equals(objectName)) {
-
+                LocationMessage locationMessage = (LocationMessage) message.getContent();
+                if (message.getSenderUserId().equals(yourUserId)) {
+                    // 对方，添加到左侧
+                    addLocation(0, locationMessage.getLat(), locationMessage.getLng(), locationMessage.getPoi());
+                } else {
+                    addLocation(1, locationMessage.getLat(), locationMessage.getLng(), locationMessage.getPoi());
+                }
             }
         }
     }
@@ -343,7 +393,9 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
             case R.id.ll_pic: // 相册
                 FileHelper.getInstance().toAlbum(this);
                 break;
-
+            case R.id.ll_location: // 位置
+                LocationActivity.startActivity(this, true, 0, 0, "", LOCATION_REQUEST_CODE);
+                break;
         }
     }
 
@@ -410,26 +462,48 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
         bseAddItem(model);
     }
 
+    /**
+     * 添加位置信息
+     *
+     * @param index
+     * @param la
+     * @param lo
+     * @param address
+     */
+    private void addLocation(int index, double la, double lo, String address) {
+        ChatModel model = new ChatModel();
+        model.setLa(la);
+        model.setLo(lo);
+        model.setAddress(address);
+        model.setMapUrl(MapManager.getInstance().getMapUrl(la, lo));
+        if (0 == index) {
+            model.setType(ChatModel.TYPE_LEFT_LOCATION);
+        } else {
+            model.setType(ChatModel.TYPE_RIGHT_LOCATION);
+        }
+        bseAddItem(model);
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
+        if (!event.getUserId().equals(yourUserId)) {
+            return;
+        }
         switch (event.getType()) {
             case EventManager.FLAG_SEND_TEXT:
                 LogUtils.i("ChatActivity event = " + event);
                 String text = event.getText();
-                if (event.getUserId().equals(yourUserId)) {
-                    addText(0, text);
-                } else {
-                    addText(1, text);
-                }
+                addText(0, text);
                 break;
             case EventManager.FLAG_SEND_IMAGE:
                 LogUtils.i("ChatActivity event = " + event);
                 String imgUrl = event.getImgUrl();
-                if (event.getUserId().equals(yourUserId)) {
-                    addImage(0, imgUrl);
-                } else {
-                    addImage(1, imgUrl);
-                }
+                addImage(0, imgUrl);
+                break;
+
+            case EventManager.FLAG_SEND_LOCATION:
+                LogUtils.i("ChatActivity event = " + event);
+                addLocation(0, event.getLa(), event.getLo(), event.getAddress());
                 break;
         }
 
@@ -451,6 +525,15 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
                         mImgFile = new File(imgRealPath);
                     }
                 }
+            } else if (LOCATION_REQUEST_CODE == requestCode) {
+                double la = data.getDoubleExtra("la", 0);
+                double lo = data.getDoubleExtra("lo", 0);
+                String address = data.getStringExtra("address");
+                LogUtils.i("onActivityResult la = " + la + ", lo = " + lo + ", address = " + address);
+
+                // 发送消息
+                addLocation(1, la, lo, address);
+                CloudManager.getInstance().sendLocationMessage(yourUserId, la, lo, address);
             }
         }
 
@@ -461,6 +544,8 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
 
             // 刷新自己的列表
             addImage(1, mImgFile);
+
+            mImgFile = null;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

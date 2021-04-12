@@ -17,6 +17,7 @@ import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 import io.rong.message.ImageMessage;
+import io.rong.message.LocationMessage;
 import io.rong.message.TextMessage;
 
 /**
@@ -182,6 +183,7 @@ public class CloudManager {
         public void onAttached(Message message) {
 
         }
+
         /**
          * 消息发送成功
          * @param message 发送成功后的消息体
@@ -214,8 +216,9 @@ public class CloudManager {
 
     /**
      * 发送图片消息
+     *
      * @param targetId 对方的id
-     * @param imgFile 图片文件
+     * @param imgFile  图片文件
      */
     public void sendImageMessage(String targetId, File imgFile) {
         // 1. 仅支持本地图片
@@ -229,6 +232,20 @@ public class CloudManager {
                 null,
                 sendImageMessageCallback);
 
+    }
+
+    /**
+     * 发送位置消息
+     *
+     * @param targetId
+     * @param la
+     * @param lo
+     * @param poi
+     */
+    public void sendLocationMessage(String targetId, double la, double lo, String poi) {
+        LocationMessage locationMessage = LocationMessage.obtain(la, lo, poi, null);
+        Message message = Message.obtain(targetId, Conversation.ConversationType.PRIVATE, locationMessage);
+        RongIMClient.getInstance().sendLocationMessage(message, null, null, iSendMessageCallback);
     }
 
     /**

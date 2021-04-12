@@ -22,6 +22,35 @@ public class MessageEvent {
     // 图片链接
     private String imgUrl;
 
+    // 位置消息
+    private double la;
+    private double lo;
+    private String address;
+
+    public double getLa() {
+        return la;
+    }
+
+    public void setLa(double la) {
+        this.la = la;
+    }
+
+    public double getLo() {
+        return lo;
+    }
+
+    public void setLo(double lo) {
+        this.lo = lo;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getImgUrl() {
         return imgUrl;
     }

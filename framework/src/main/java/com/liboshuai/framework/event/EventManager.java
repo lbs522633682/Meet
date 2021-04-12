@@ -17,6 +17,9 @@ public class EventManager {
 
     // 发送图片消息
     public static final int FLAG_SEND_IMAGE = 1002;
+
+    // 发送位置消息
+    public static final int FLAG_SEND_LOCATION = 1003;
     /**
      * Event 的步骤
      * 1. 注册

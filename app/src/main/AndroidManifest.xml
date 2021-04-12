@@ -15,7 +15,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <!-- 高德地图申请的key -->
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="726289cd92904f02f7857c2351a3e7ee" />
+
         <activity android:name=".ui.ContactFriendActivity"></activity>
+        <activity android:name=".ui.LocationActivity"></activity>
         <activity android:name=".ui.UserInfoActivity"></activity>
 
         <provider

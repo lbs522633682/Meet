@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.manager.CloudManager;
+import com.liboshuai.framework.manager.MapManager;
 import com.liboshuai.framework.utils.SpUtils;
 import com.tencent.bugly.crashreport.CrashReport;
 
@@ -44,5 +45,6 @@ public class Framework {
         CrashReport.initCrashReport(context, "3f29febdac", true);
         CloudManager.getInstance().init(context);
         LitePal.initialize(context);
+        MapManager.getInstance().initMap(context);
     }
 }

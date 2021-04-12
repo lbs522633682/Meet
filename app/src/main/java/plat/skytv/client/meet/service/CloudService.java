@@ -33,6 +33,7 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 import io.rong.message.ImageMessage;
+import io.rong.message.LocationMessage;
 import io.rong.message.TextMessage;
 
 
@@ -155,7 +156,13 @@ public class CloudService extends Service {
                         EventManager.post(messageEvent);
                     }
                 } else if (CloudManager.MSG_LOCATION_NAME.equals(objectName)) { // 位置消息
-
+                    LocationMessage locationMessage = (LocationMessage) message.getContent();
+                    MessageEvent messageEvent = new MessageEvent(EventManager.FLAG_SEND_LOCATION);
+                    messageEvent.setLa(locationMessage.getLat());
+                    messageEvent.setLo(locationMessage.getLng());
+                    messageEvent.setAddress(locationMessage.getPoi());
+                    messageEvent.setUserId(message.getSenderUserId());
+                    EventManager.post(messageEvent);
                 }
 
                 return false;
