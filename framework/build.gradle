@@ -61,6 +61,9 @@ dependencies {
     api rootProject.ext.dependencies["3dmap"]
     api rootProject.ext.dependencies["location"]
     api rootProject.ext.dependencies["search"]
+    // 融云 聊天
     api project(path: ':IMLib')
+    // 融云 音视频通话
+    api project(path: ':CallLib')
 
 }

@@ -244,10 +244,10 @@ public class UserInfoActivity extends BaseBackActivity implements View.OnClickLi
                 }
                 break;
             case R.id.btn_audio_chat:
-
+                CloudManager.getInstance().startAudioCall(userId);
                 break;
             case R.id.btn_video_chat:
-
+                CloudManager.getInstance().startVideoCall(userId);
                 break;
             case R.id.tv_cancel:
                 DialogManager.getInstance().hide(mAddFriendDialog);

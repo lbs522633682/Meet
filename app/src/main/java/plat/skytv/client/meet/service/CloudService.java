@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.text.TextUtils;
+import android.view.SurfaceView;
 
 import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.db.LitepalHelper;
@@ -29,6 +30,11 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+
+import io.rong.calllib.IRongCallListener;
+import io.rong.calllib.IRongReceivedCallListener;
+import io.rong.calllib.RongCallCommon;
+import io.rong.calllib.RongCallSession;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
@@ -166,6 +172,92 @@ public class CloudService extends Service {
                 }
 
                 return false;
+            }
+        });
+
+        // 设置来电监听
+        CloudManager.getInstance().setReceivedCallListener(new IRongReceivedCallListener() {
+            @Override
+            public void onReceivedCall(RongCallSession rongCallSession) {
+                // 接收到来电
+                LogUtils.i("onReceivedCall rongCallSession = " + JsonUtil.toJSON(rongCallSession));
+            }
+
+            @Override
+            public void onCheckPermission(RongCallSession rongCallSession) {
+                // 检查权限的回调
+            }
+        });
+
+        CloudManager.getInstance().setVoIPCallListener(new IRongCallListener() {
+            @Override
+            public void onCallOutgoing(RongCallSession rongCallSession, SurfaceView surfaceView) {
+
+            }
+
+            @Override
+            public void onCallConnected(RongCallSession rongCallSession, SurfaceView surfaceView) {
+
+            }
+
+            @Override
+            public void onCallDisconnected(RongCallSession rongCallSession, RongCallCommon.CallDisconnectedReason callDisconnectedReason) {
+
+            }
+
+            @Override
+            public void onRemoteUserRinging(String s) {
+
+            }
+
+            @Override
+            public void onRemoteUserJoined(String s, RongCallCommon.CallMediaType callMediaType, int i, SurfaceView surfaceView) {
+
+            }
+
+            @Override
+            public void onRemoteUserInvited(String s, RongCallCommon.CallMediaType callMediaType) {
+
+            }
+
+            @Override
+            public void onRemoteUserLeft(String s, RongCallCommon.CallDisconnectedReason callDisconnectedReason) {
+
+            }
+
+            @Override
+            public void onMediaTypeChanged(String s, RongCallCommon.CallMediaType callMediaType, SurfaceView surfaceView) {
+
+            }
+
+            @Override
+            public void onError(RongCallCommon.CallErrorCode callErrorCode) {
+
+            }
+
+            @Override
+            public void onRemoteCameraDisabled(String s, boolean b) {
+
+            }
+
+            @Override
+            public void onRemoteMicrophoneDisabled(String s, boolean b) {
+
+            }
+
+            @Override
+            public void onNetworkReceiveLost(String s, int i) {
+
+            }
+
+            @Override
+            public void onNetworkSendLost(int i, int i1) {
+
+            }
+
+            @Override
+            public void onFirstRemoteVideoFrame(String s, int i, int i1) {
+
             }
         });
     }

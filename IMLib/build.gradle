@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.android["minSdkVersion"]
         targetSdkVersion rootProject.ext.android["targetSdkVersion"]
-        versionCode 20200803
-        versionName "4.0.1.1_hotfix/4.0.1"
+        versionCode 2019091718
+        versionName "2.9.24 Stable"
     }
 
     sourceSets {

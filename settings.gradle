@@ -1,3 +1,4 @@
+include ':CallLib'
 include ':IMLib'
 include ':app', ':framework'
 rootProject.name='Meet'

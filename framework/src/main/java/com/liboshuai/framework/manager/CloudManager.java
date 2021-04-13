@@ -9,13 +9,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
+import io.rong.calllib.IRongCallListener;
+import io.rong.calllib.IRongReceivedCallListener;
+import io.rong.calllib.RongCallClient;
+import io.rong.calllib.RongCallCommon;
 import io.rong.imlib.IRongCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
-import io.rong.imlib.model.MessageContent;
 import io.rong.message.ImageMessage;
 import io.rong.message.LocationMessage;
 import io.rong.message.TextMessage;
@@ -96,6 +100,11 @@ public class CloudManager {
 
         RongIMClient.connect(token, new RongIMClient.ConnectCallback() {
             @Override
+            public void onTokenIncorrect() {
+
+            }
+
+            @Override
             public void onSuccess(String s) {
                 LogUtils.i("connect s = " + s);
                 // 测试消息 发送
@@ -103,14 +112,10 @@ public class CloudManager {
             }
 
             @Override
-            public void onError(RongIMClient.ConnectionErrorCode connectionErrorCode) {
+            public void onError(RongIMClient.ErrorCode connectionErrorCode) {
                 LogUtils.e("cloud token error code = " + connectionErrorCode);
             }
 
-            @Override
-            public void onDatabaseOpened(RongIMClient.DatabaseOpenStatus databaseOpenStatus) {
-
-            }
         });
     }
 
@@ -285,4 +290,152 @@ public class CloudManager {
                 callback);
 
     }
+
+    /*************************************CallLib api********************************************/
+
+    /**
+     * 发起音视频 通话
+     *
+     * @param targetId
+     * @param mediaType {@Link RongCallCommon.CallMediaType.VIDEO} 通话类型 语音 or 视频
+     */
+    private void startCall(String targetId, RongCallCommon.CallMediaType mediaType) {
+        Conversation.ConversationType conversationType = Conversation.ConversationType.PRIVATE;
+        List<String> userIds = new ArrayList<>();
+        userIds.add(targetId);
+        String extra = "";
+        RongCallClient.getInstance().startCall(conversationType, targetId, userIds, null, mediaType, extra);
+    }
+
+    /**
+     * 音频通话
+     *
+     * @param targetId
+     */
+    public void startAudioCall(String targetId) {
+        startCall(targetId, RongCallCommon.CallMediaType.AUDIO);
+    }
+
+    /**
+     * 视频通话
+     *
+     * @param targetId
+     */
+    public void startVideoCall(String targetId) {
+        startCall(targetId, RongCallCommon.CallMediaType.VIDEO);
+    }
+
+    /**
+     * 设置音视频通话监听
+     *
+     * @param iRongReceivedCallListener
+     */
+    public void setReceivedCallListener(IRongReceivedCallListener iRongReceivedCallListener) {
+        RongCallClient.setReceivedCallListener(iRongReceivedCallListener);
+
+    }
+
+    /**
+     * 设置通话状态的监听
+     *
+     * @param callListener
+     */
+    public void setVoIPCallListener(IRongCallListener callListener) {
+        RongCallClient.getInstance().setVoIPCallListener(callListener);
+    }
+
+    /**
+     * 接听来电
+     *
+     * @param callId
+     */
+    public void acceptCall(String callId) {
+        // im未连接或者不在通话中，RongCallClient 和 RongCallSession 为空
+        if (RongCallClient.getInstance() != null && RongCallClient.getInstance().getCallSession() != null) {
+            LogUtils.i("acceptCall callId = " + callId + ", CallSessionCallId = " + RongCallClient.getInstance().getCallSession().getCallId());
+            RongCallClient.getInstance().acceptCall(RongCallClient.getInstance().getCallSession().getCallId());
+        }
+    }
+
+    /**
+     * 挂断来电
+     *
+     * @param callId
+     */
+    public void hangUpCall(String callId) {
+        // im未连接或者不在通话中，RongCallClient 和 RongCallSession 为空
+        if (RongCallClient.getInstance() != null && RongCallClient.getInstance().getCallSession() != null) {
+            LogUtils.i("hangUpCall callId = " + callId + ", CallSessionCallId = " + RongCallClient.getInstance().getCallSession().getCallId());
+            RongCallClient.getInstance().hangUpCall(RongCallClient.getInstance().getCallSession().getCallId());
+        }
+
+    }
+
+
+    /**
+     * 切换媒体类型
+     *
+     * @param callMediaType
+     */
+    public void changeCallMediaType(RongCallCommon.CallMediaType callMediaType) {
+        RongCallClient.getInstance().changeCallMediaType(callMediaType);
+    }
+
+    /**
+     * 切换前后相机
+     */
+    public void switchCamera() {
+        RongCallClient.getInstance().switchCamera();
+    }
+
+    /**
+     * 设置本地摄像头是否可用
+     *
+     * @param enable
+     */
+    public void setEnableLocalVideo(boolean enable) {
+        RongCallClient.getInstance().setEnableLocalVideo(enable);
+    }
+
+    /**
+     * 设置本地音频是否可用
+     *
+     * @param enable
+     */
+    public void setEnableLocalAudio(boolean enable) {
+        RongCallClient.getInstance().setEnableLocalAudio(enable);
+    }
+
+    /**
+     * 设置免提开关
+     *
+     * @param enable
+     */
+    public void setEnableSpeakerphone(boolean enable) {
+        RongCallClient.getInstance().setEnableSpeakerphone(enable);
+    }
+
+    /**
+     * 开启录音
+     *
+     * @param filePath
+     */
+    public void startAudioRecording(String filePath) {
+        RongCallClient.getInstance().startAudioRecording(filePath);
+    }
+
+    /**
+     * 关闭录音
+     */
+    public void stopAudioRecording() {
+        RongCallClient.getInstance().stopAudioRecording();
+    }
+
+    /**
+     * 检查音视频设备是否可用
+     */
+    public boolean isVoIPEnabled(Context context) {
+        return RongCallClient.getInstance().isVoIPEnabled(context);
+    }
+
 }
