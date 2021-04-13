@@ -47,7 +47,11 @@ public class BaseActivity extends AppCompatActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_CONTACTS,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.CHANGE_NETWORK_STATE,
+            Manifest.permission.WRITE_SETTINGS,
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
 
     // 待申请的权限集合

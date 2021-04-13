@@ -5,6 +5,7 @@ import android.content.Context;
 import com.liboshuai.framework.bmob.BmobManager;
 import com.liboshuai.framework.manager.CloudManager;
 import com.liboshuai.framework.manager.MapManager;
+import com.liboshuai.framework.manager.VoiceManager;
 import com.liboshuai.framework.utils.SpUtils;
 import com.tencent.bugly.crashreport.CrashReport;
 

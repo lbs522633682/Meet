@@ -1,5 +1,17 @@
 
 开发日志 思考每一个遇到的问题
+-----------------------------------20210413---------------------------
+## 讯飞语音
+
+    1. 语音识别 转文字
+
+    2. appid = 5e7c1ecf
+
+    3. 文档：https://www.xfyun.cn/doc/asr/voicedictation/Android-SDK.html
+
+        https://www.xfyun.cn/doc/asr/voicedictation/Android-SDK.html#_2%E3%80%81sdk%E9%9B%86%E6%88%90%E6%8C%87%E5%8D%97
+
+        https://www.xfyun.cn/doc/mscapi/Android/androidrecognizer.html#%E7%B1%BBrecognizerresult
 -----------------------------------20210412---------------------------
 ## 已完成
 

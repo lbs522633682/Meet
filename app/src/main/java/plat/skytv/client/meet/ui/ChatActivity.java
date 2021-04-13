@@ -14,6 +14,9 @@ import android.widget.LinearLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.iflytek.cloud.RecognizerResult;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.ui.RecognizerDialogListener;
 import com.liboshuai.framework.adapter.CommonAdapter;
 import com.liboshuai.framework.adapter.CommonViewHolder;
 import com.liboshuai.framework.base.BaseBackActivity;
@@ -24,6 +27,7 @@ import com.liboshuai.framework.event.MessageEvent;
 import com.liboshuai.framework.helper.FileHelper;
 import com.liboshuai.framework.manager.CloudManager;
 import com.liboshuai.framework.manager.MapManager;
+import com.liboshuai.framework.manager.VoiceManager;
 import com.liboshuai.framework.utils.JsonUtil;
 import com.liboshuai.framework.utils.LogUtils;
 
@@ -36,6 +40,7 @@ import java.util.Collections;
 import java.util.List;
 
 import gson.TextBean;
+import gson.VoiceBean;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Message;
 import io.rong.message.ImageMessage;
@@ -134,6 +139,7 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
     }
 
     private void initView() {
+
         mChatView = findViewById(R.id.mChatView);
         et_input_msg = findViewById(R.id.et_input_msg);
         btn_send_msg = findViewById(R.id.btn_send_msg);
@@ -147,6 +153,7 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
         ll_camera.setOnClickListener(this);
         ll_pic.setOnClickListener(this);
         ll_location.setOnClickListener(this);
+        ll_voice.setOnClickListener(this);
 
         mChatAdapter = new CommonAdapter<>(mList, new CommonAdapter.OnMoreBindDataListener<ChatModel>() {
             @Override
@@ -395,6 +402,35 @@ public class ChatActivity extends BaseBackActivity implements View.OnClickListen
                 break;
             case R.id.ll_location: // 位置
                 LocationActivity.startActivity(this, true, 0, 0, "", LOCATION_REQUEST_CODE);
+                break;
+            case R.id.ll_voice: // 语音识别
+                final StringBuilder speakResult = new StringBuilder(); // 每次点击，识别的语音结果
+                VoiceManager.getInstance(this).startSpeak(new RecognizerDialogListener() {
+                    @Override
+                    public void onResult(RecognizerResult recognizerResult, boolean islast) {
+                        LogUtils.i("onResult islast = " + islast + ", recognizerResult = " + recognizerResult.getResultString());
+                        StringBuilder temp = new StringBuilder();
+                        VoiceBean voiceBean = JsonUtil.parseObject(recognizerResult.getResultString(), VoiceBean.class);
+                        List<VoiceBean.WsBean> ws = voiceBean.getWs();
+                        for (int i = 0; i < ws.size(); i++) {
+                            VoiceBean.WsBean wsBean = ws.get(i);
+                            List<VoiceBean.WsBean.CwBean> cw = wsBean.getCw();
+                            for (int j = 0; j < cw.size(); j++) {
+                                VoiceBean.WsBean.CwBean cwBean = cw.get(j);
+                                temp.append(cwBean.getW());
+                            }
+                        }
+                        speakResult.append(temp);
+                        if (islast) { // 如果是最后一句 显示到 EditText
+                            et_input_msg.setText(speakResult.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onError(SpeechError speechError) {
+                        LogUtils.i("startSpeak onError speechError = " + speechError.getErrorDescription());
+                    }
+                });
                 break;
         }
     }
