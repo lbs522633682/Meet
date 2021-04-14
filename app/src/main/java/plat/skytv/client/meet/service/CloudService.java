@@ -2,6 +2,8 @@ package plat.skytv.client.meet.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.view.SurfaceView;
@@ -24,7 +26,7 @@ import com.liboshuai.framework.manager.MediaPlayerManager;
 import com.liboshuai.framework.utils.JsonUtil;
 import com.liboshuai.framework.utils.LogUtils;
 import com.liboshuai.framework.utils.SpUtils;
-import com.liboshuai.framework.utils.ToastUtil;
+import com.liboshuai.framework.utils.TimeUtils;
 
 import java.util.List;
 
@@ -61,6 +63,23 @@ import plat.skytv.client.meet.R;
  */
 public class CloudService extends Service implements View.OnClickListener {
 
+
+    private static final int H_TIME_WHAT = 1000;
+
+    private int mCallTimer = 0; // 通话计时
+    private Handler mTimerHander = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(android.os.Message msg) {
+            if (msg.what == H_TIME_WHAT) {
+                mCallTimer ++;
+                String timeText = TimeUtils.formatTimer(mCallTimer * 1000);
+                audio_tv_status.setText(timeText);
+                mTimerHander.sendEmptyMessageDelayed(H_TIME_WHAT, 1000);
+            }
+            return false;
+        }
+    });
+
     private Disposable disposable;
 
     private CircleImageView audio_iv_photo;
@@ -77,7 +96,9 @@ public class CloudService extends Service implements View.OnClickListener {
 
     private View mFullAudioView;
 
-    private MediaPlayerManager mMediaPlayManager;
+    // 播放来电铃声
+    private MediaPlayerManager mAudioPlayManager;
+    private MediaPlayerManager mHangUpPlayManager;
 
     private String mCallId = "";
 
@@ -96,8 +117,15 @@ public class CloudService extends Service implements View.OnClickListener {
     }
 
     private void initPlayService() {
-        mMediaPlayManager = new MediaPlayerManager();
-        mMediaPlayManager.setLooping(true);
+        mAudioPlayManager = new MediaPlayerManager();
+        mHangUpPlayManager = new MediaPlayerManager();
+//        mMediaPlayManager.setLooping(true); // 没有生效
+        mAudioPlayManager.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mAudioPlayManager.startPlay(CloudManager.callAudioPath);
+            }
+        });
     }
 
     private void initWindow() {
@@ -301,12 +329,54 @@ public class CloudService extends Service implements View.OnClickListener {
             public void onCallConnected(RongCallSession rongCallSession, SurfaceView surfaceView) {
                 // 已建立通话
                 LogUtils.i("onCallConnected rongCallSession = " + JsonUtil.toJSON(rongCallSession));
+
+                /**
+                 * 1. 开始计时
+                 * 2. 关闭铃声
+                 * 3. 更新按钮
+                 */
+
+                // 关闭铃声
+                if (mAudioPlayManager.isPlaying()) {
+                    mAudioPlayManager.stopPlay();
+                }
+
+                // 开始计时
+                mTimerHander.sendEmptyMessage(H_TIME_WHAT);
+
+                // 更新按钮
+                if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.AUDIO) {
+                    LogUtils.i("onReceivedCall 收到语音通话");
+                    goneAudioView(true, false, true, true, true);
+                } else if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.VIDEO) {
+                    LogUtils.i("onReceivedCall 收到视频通话");
+                }
             }
 
             @Override
             public void onCallDisconnected(RongCallSession rongCallSession, RongCallCommon.CallDisconnectedReason callDisconnectedReason) {
                 // 通话结束
                 LogUtils.i("onCallDisconnected rongCallSession = " + JsonUtil.toJSON(rongCallSession));
+
+                // 铃声挂断
+                if (mAudioPlayManager.isPlaying()) {
+                    mAudioPlayManager.stopPlay();
+                }
+
+                // 播放挂断铃声
+                mHangUpPlayManager.startPlay(CloudManager.callAudioHangup);
+
+                // 关闭计时器
+                mTimerHander.removeMessages(H_TIME_WHAT);
+                // 重置通话时间
+                mCallTimer = 0;
+                // 关闭通话界面
+                if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.AUDIO) {
+                    LogUtils.i("onReceivedCall 收到语音通话");
+                    WindowHelper.getInstance().hideView(mFullAudioView);
+                } else if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.VIDEO) {
+                    LogUtils.i("onReceivedCall 收到视频通话");
+                }
             }
 
             @Override
@@ -390,8 +460,8 @@ public class CloudService extends Service implements View.OnClickListener {
     private void updateWindowInfo(int index, String id) {
 
         if (index == 0) {
-            goneAudioView(false, false, true, true, false);
-            mMediaPlayManager.startPlay(CloudManager.callAudioPath);
+            goneAudioView(false, true, true, false, false);
+            mAudioPlayManager.startPlay(CloudManager.callAudioPath);
         } else {
             goneAudioView(false, false, true, false, false);
         }
@@ -425,6 +495,7 @@ public class CloudService extends Service implements View.OnClickListener {
                 // 录音
                 if (mIsRecording) {
                     mIsRecording = false;
+                    audio_iv_recording.setImageResource(R.drawable.img_recording);
                     CloudManager.getInstance().stopAudioRecording();
                 } else {
                     mIsRecording = true;
@@ -434,9 +505,11 @@ public class CloudService extends Service implements View.OnClickListener {
                 break;
             case R.id.audio_ll_answer:
                 // 接听
+                CloudManager.getInstance().acceptCall(mCallId);
                 break;
             case R.id.audio_ll_hangup:
                 // 挂断
+                CloudManager.getInstance().hangUpCall(mCallId);
                 break;
             case R.id.audio_ll_hf:
                 // 免提

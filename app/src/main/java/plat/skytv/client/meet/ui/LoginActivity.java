@@ -154,8 +154,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String pwd = SpUtils.getInstance().getString(Consts.SP_PWD, null);
 
         // TODo 默认登录自己的账号 测试用
-        //account = "15967153155";
-        account = "12510603000";
+        account = "15967153155";
+        //account = "12510603000";
         pwd = "123456";
 
         et_phone.setText(account);

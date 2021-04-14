@@ -343,6 +343,9 @@ public class CloudManager {
      * @param iRongReceivedCallListener
      */
     public void setReceivedCallListener(IRongReceivedCallListener iRongReceivedCallListener) {
+        if (iRongReceivedCallListener == null) {
+            return;
+        }
         RongCallClient.setReceivedCallListener(iRongReceivedCallListener);
 
     }
@@ -353,6 +356,9 @@ public class CloudManager {
      * @param callListener
      */
     public void setVoIPCallListener(IRongCallListener callListener) {
+        if (callListener == null) {
+            return;
+        }
         RongCallClient.getInstance().setVoIPCallListener(callListener);
     }
 
