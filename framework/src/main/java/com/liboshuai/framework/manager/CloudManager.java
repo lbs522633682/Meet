@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.liboshuai.framework.utils.LogUtils;
+import com.liboshuai.framework.utils.ToastUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +50,11 @@ public class CloudManager {
     public static final String TYPE_ADD_FRIEND = "TYPE_ADD_FRIEND";
     // 同意添加好友的消息
     public static final String TYPE_AGREED_FRIEND = "TYPE_AGREED_FRIEND";
+
+    //来电铃声
+    public static final String callAudioPath = "http://downsc.chinaz.net/Files/DownLoad/sound1/201501/5363.wav";
+    //挂断铃声
+    public static final String callAudioHangup = "http://downsc.chinaz.net/Files/DownLoad/sound1/201501/5351.wav";
 
 
     private static CloudManager mInstnce;
@@ -312,7 +318,10 @@ public class CloudManager {
      *
      * @param targetId
      */
-    public void startAudioCall(String targetId) {
+    public void startAudioCall(Context context, String targetId) {
+        if (!isVoIPEnabled(context)) {
+            return;
+        }
         startCall(targetId, RongCallCommon.CallMediaType.AUDIO);
     }
 
@@ -321,7 +330,10 @@ public class CloudManager {
      *
      * @param targetId
      */
-    public void startVideoCall(String targetId) {
+    public void startVideoCall(Context context, String targetId) {
+        if (!isVoIPEnabled(context)) {
+            return;
+        }
         startCall(targetId, RongCallCommon.CallMediaType.VIDEO);
     }
 
@@ -435,7 +447,11 @@ public class CloudManager {
      * 检查音视频设备是否可用
      */
     public boolean isVoIPEnabled(Context context) {
-        return RongCallClient.getInstance().isVoIPEnabled(context);
+        if (!RongCallClient.getInstance().isVoIPEnabled(context)) {
+            ToastUtil.showTextToast(context, "设备不支持音视频通话");
+            return false;
+        }
+        return true;
     }
 
 }

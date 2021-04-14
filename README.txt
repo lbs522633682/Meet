@@ -1,5 +1,145 @@
 
 开发日志 思考每一个遇到的问题
+
+-----------------------------------20210414---------------------------
+
+## android 一键findViewByid
+
+    http://android.lineten.net/layout.php
+
+## 实现音频的通话服务
+
+    1. 监听通话的装填 --已完成
+
+        完成 处理 录音的逻辑
+
+        完成 处理 免提的逻辑
+
+    2. 处理各个通话的逻辑 -- 未完成
+
+    3. 通话的倒计时 -- 未完成
+
+## 认识窗口WindowManager
+
+### 一、源码分析
+
+    1. public interface WindowManager extends ViewManager {
+
+    2. ViewManager.java
+
+        public interface ViewManager
+        {
+            public void addView(View view, ViewGroup.LayoutParams params);
+            public void updateViewLayout(View view, ViewGroup.LayoutParams params);
+            public void removeView(View view);
+        }
+
+    3. public final class WindowManagerImpl implements WindowManager {
+
+        // 借助 辅助类 mGlobal来实现操作
+
+        @Override
+        public void addView(@NonNull View view, @NonNull ViewGroup.LayoutParams params) {
+            applyDefaultToken(params);
+            mGlobal.addView(view, params, mContext.getDisplay(), mParentWindow);
+        }
+
+        @Override
+        public void updateViewLayout(@NonNull View view, @NonNull ViewGroup.LayoutParams params) {
+            applyDefaultToken(params);
+            mGlobal.updateViewLayout(view, params);
+        }
+
+        @Override
+        public void removeView(View view) {
+            mGlobal.removeView(view, false);
+        }
+
+    4. private final WindowManagerGlobal mGlobal = WindowManagerGlobal.getInstance();
+
+    5. WindowManagerGlobal.java
+
+        public void addView(View view, ViewGroup.LayoutParams params,
+            Display display, Window parentWindow) {
+            ...
+            mViews.add(view);
+            mRoots.add(root);
+            mParams.add(wparams);
+            ...
+            root.setView(view, wparams, panelParentView);--进入
+
+            }
+
+    6. ViewRootImpl.setView
+
+        public void setView(View view, WindowManager.LayoutParams attrs, View panelParentView) {
+
+            ...
+            // 添加到显示屏上
+            res = mWindowSession.addToDisplay(mWindow, mSeq, mWindowAttributes,
+                                getHostVisibility(), mDisplay.getDisplayId(), mTmpFrame,
+                                mAttachInfo.mContentInsets, mAttachInfo.mStableInsets,
+                                mAttachInfo.mOutsets, mAttachInfo.mDisplayCutout, mInputChannel,
+                                mTempInsets);
+            ...}
+
+    7. 到此 已经将view添加到显示屏上了，下面看下如何刷新的view，依旧是WindowManagerGlobal.java
+
+        public void updateViewLayout(View view, ViewGroup.LayoutParams params) {
+            if (view == null) {
+                throw new IllegalArgumentException("view must not be null");
+            }
+            if (!(params instanceof WindowManager.LayoutParams)) {
+                throw new IllegalArgumentException("Params must be WindowManager.LayoutParams");
+            }
+
+            final WindowManager.LayoutParams wparams = (WindowManager.LayoutParams)params;
+
+            view.setLayoutParams(wparams);
+
+            synchronized (mLock) {
+                int index = findViewLocked(view, true);
+                ViewRootImpl root = mRoots.get(index);
+                mParams.remove(index);
+                mParams.add(index, wparams);
+                root.setLayoutParams(wparams, false);
+            }
+        }
+
+    8.ViewRootImpl.setLayoutParams
+
+        void setLayoutParams(WindowManager.LayoutParams attrs, boolean newView) {
+            ...
+            requestLayout(); // 刷新UI 展示出来
+            ...
+        }
+
+    9. removeView 同理
+
+
+    10. 主要的是四个List
+
+        @UnsupportedAppUsage
+        private final ArrayList<View> mViews = new ArrayList<View>();
+        @UnsupportedAppUsage
+        private final ArrayList<ViewRootImpl> mRoots = new ArrayList<ViewRootImpl>();
+        @UnsupportedAppUsage
+        private final ArrayList<WindowManager.LayoutParams> mParams =
+                new ArrayList<WindowManager.LayoutParams>();
+        private final ArraySet<View> mDyingViews = new ArraySet<View>();
+
+### 二、WindowManager的Flag
+
+    用来控制窗口的属性
+
+    FLAG_NOT_TOUCH_MODAL ： 屏幕上弹窗之外的地方能够点击、弹窗上的EditText也可以输入、键盘能够弹出来
+
+    FLAG_NOT_FOCUSABLE ： 没有这句的话，手机会出现一个奇怪的现象。除了点击弹窗，屏幕上的其他东西都点不了，用户看到的手机就像卡死了一样。如果弹窗没有正常显示，用户就感觉手机莫名其妙的卡，卡爆了。但是EditText不能输入
+
+    FLAG_SHOW_WHEN_LOCKED ： 让窗口显示的特殊标志，当屏幕锁定时
+
+### 三、WindowManager的Type
+
 -----------------------------------20210413---------------------------
 
 ## 融云 音视频集成
