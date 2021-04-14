@@ -83,3 +83,5 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+/.idea/shelf/Uncommitted_changes_before_Update_at_2021_4_10_1_20_[Default_Changelist]/shelved.patch
+/.idea/shelf/Uncommitted_changes_before_Update_at_2021_4_10_1_20__Default_Changelist_.xml
