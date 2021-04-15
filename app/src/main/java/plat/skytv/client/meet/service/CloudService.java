@@ -10,6 +10,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.liboshuai.framework.bmob.BmobManager;
@@ -27,6 +28,10 @@ import com.liboshuai.framework.utils.JsonUtil;
 import com.liboshuai.framework.utils.LogUtils;
 import com.liboshuai.framework.utils.SpUtils;
 import com.liboshuai.framework.utils.TimeUtils;
+import com.liboshuai.framework.utils.ToastUtil;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -71,9 +76,10 @@ public class CloudService extends Service implements View.OnClickListener {
         @Override
         public boolean handleMessage(android.os.Message msg) {
             if (msg.what == H_TIME_WHAT) {
-                mCallTimer ++;
+                mCallTimer++;
                 String timeText = TimeUtils.formatTimer(mCallTimer * 1000);
                 audio_tv_status.setText(timeText);
+                video_tv_time.setText(timeText);
                 mTimerHander.sendEmptyMessageDelayed(H_TIME_WHAT, 1000);
             }
             return false;
@@ -96,9 +102,27 @@ public class CloudService extends Service implements View.OnClickListener {
 
     private View mFullAudioView;
 
-    // 播放来电铃声
+    private RelativeLayout video_big_video;
+    private RelativeLayout video_small_video;
+    private LinearLayout video_ll_info;
+    private de.hdodenhof.circleimageview.CircleImageView video_iv_photo;
+    private TextView video_tv_name;
+    private TextView video_tv_status;
+    private TextView video_tv_time;
+    private LinearLayout video_ll_answer;
+    private LinearLayout video_ll_hangup;
+    private View mFullVideoView;
+
+    // 媒体类 播放来电铃声
     private MediaPlayerManager mAudioPlayManager;
     private MediaPlayerManager mHangUpPlayManager;
+
+    // 摄像类
+    private SurfaceView mLocalView;
+    private SurfaceView mRemoteView;
+
+    // 本地视频是否小窗展示
+    private boolean mIsSmallShowLocal = false;
 
     private String mCallId = "";
 
@@ -111,6 +135,7 @@ public class CloudService extends Service implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
 
+        EventManager.register(this);
         initWindow();
         initPlayService();
         linkCloudServer();
@@ -150,11 +175,28 @@ public class CloudService extends Service implements View.OnClickListener {
         audio_ll_hf.setOnClickListener(this);
         audio_iv_small.setOnClickListener(this);
 
+        mFullVideoView = WindowHelper.getInstance().getView(R.layout.layout_chat_video);
+
+        video_big_video = (RelativeLayout) mFullVideoView.findViewById(R.id.video_big_video);
+        video_small_video = (RelativeLayout) mFullVideoView.findViewById(R.id.video_small_video);
+        video_ll_info = (LinearLayout) mFullVideoView.findViewById(R.id.video_ll_info);
+        video_iv_photo = (de.hdodenhof.circleimageview.CircleImageView) mFullVideoView.findViewById(R.id.video_iv_photo);
+        video_tv_name = (TextView) mFullVideoView.findViewById(R.id.video_tv_name);
+        video_tv_status = (TextView) mFullVideoView.findViewById(R.id.video_tv_status);
+        video_tv_time = (TextView) mFullVideoView.findViewById(R.id.video_tv_time);
+        video_ll_answer = (LinearLayout) mFullVideoView.findViewById(R.id.video_ll_answer);
+        video_ll_hangup = (LinearLayout) mFullVideoView.findViewById(R.id.video_ll_hangup);
+
+        video_ll_answer.setOnClickListener(this);
+        video_ll_hangup.setOnClickListener(this);
+        video_small_video.setOnClickListener(this);
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        EventManager.unregister(this);
         if (disposable != null) {
             disposable.dispose();
         }
@@ -268,7 +310,7 @@ public class CloudService extends Service implements View.OnClickListener {
             @Override
             public void onReceivedCall(RongCallSession rongCallSession) {
                 // 接收到来电
-                LogUtils.i("onReceivedCall rongCallSession = " + JsonUtil.toJSON(rongCallSession));
+                LogUtils.i("onReceivedCall rongCallSession");
 
                 /**
                  * 1. 获取拨打和接听的 用户id
@@ -282,10 +324,13 @@ public class CloudService extends Service implements View.OnClickListener {
                     return;
                 }
 
+                // 播放来电铃声
+                mAudioPlayManager.startPlay(CloudManager.callAudioPath);
+
                 // 呼叫端UserId
                 String callUserId = rongCallSession.getCallerUserId();
                 // 更新UI
-                updateWindowInfo(0, callUserId);
+                updateWindowInfo(0, rongCallSession.getMediaType(), callUserId);
                 // 通话ID
                 mCallId = rongCallSession.getCallId();
 
@@ -294,6 +339,7 @@ public class CloudService extends Service implements View.OnClickListener {
                     WindowHelper.getInstance().showView(mFullAudioView);
                 } else if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.VIDEO) {
                     LogUtils.i("onReceivedCall 收到视频通话");
+                    WindowHelper.getInstance().showView(mFullVideoView);
                 }
             }
 
@@ -308,27 +354,29 @@ public class CloudService extends Service implements View.OnClickListener {
             @Override
             public void onCallOutgoing(RongCallSession rongCallSession, SurfaceView surfaceView) {
                 // 电话播出的回调
-                LogUtils.i("onCallOutgoing rongCallSession = " + JsonUtil.toJSON(rongCallSession));
+                LogUtils.i("onCallOutgoing rongCallSession ");
 
                 String targetId = rongCallSession.getTargetId();
                 // 获取通话id
                 mCallId = rongCallSession.getCallId();
 
-                updateWindowInfo(1, targetId);
+                updateWindowInfo(1, rongCallSession.getMediaType(), targetId);
 
                 // 展示播出窗口
                 if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.AUDIO) {
-                    LogUtils.i("onReceivedCall 收到语音通话");
+                    LogUtils.i("onCallOutgoing 电话已播出");
                     WindowHelper.getInstance().showView(mFullAudioView);
                 } else if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.VIDEO) {
-                    LogUtils.i("onReceivedCall 收到视频通话");
+                    LogUtils.i("onCallOutgoing 视频通话已呼出");
+                    WindowHelper.getInstance().showView(mFullVideoView);
+                    mLocalView = surfaceView;
                 }
             }
 
             @Override
             public void onCallConnected(RongCallSession rongCallSession, SurfaceView surfaceView) {
                 // 已建立通话
-                LogUtils.i("onCallConnected rongCallSession = " + JsonUtil.toJSON(rongCallSession));
+                LogUtils.i("onCallConnected rongCallSession");
 
                 /**
                  * 1. 开始计时
@@ -346,17 +394,19 @@ public class CloudService extends Service implements View.OnClickListener {
 
                 // 更新按钮
                 if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.AUDIO) {
-                    LogUtils.i("onReceivedCall 收到语音通话");
+                    LogUtils.i("onCallConnected 收到语音通话");
                     goneAudioView(true, false, true, true, true);
                 } else if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.VIDEO) {
-                    LogUtils.i("onReceivedCall 收到视频通话");
+                    LogUtils.i("onCallConnected 收到视频通话");
+                    goneVideoView(false, true, true, false, true, true);
+                    mLocalView = surfaceView;
                 }
             }
 
             @Override
             public void onCallDisconnected(RongCallSession rongCallSession, RongCallCommon.CallDisconnectedReason callDisconnectedReason) {
                 // 通话结束
-                LogUtils.i("onCallDisconnected rongCallSession = " + JsonUtil.toJSON(rongCallSession));
+                LogUtils.i("onCallDisconnected rongCallSession");
 
                 // 铃声挂断
                 if (mAudioPlayManager.isPlaying()) {
@@ -376,6 +426,7 @@ public class CloudService extends Service implements View.OnClickListener {
                     WindowHelper.getInstance().hideView(mFullAudioView);
                 } else if (rongCallSession.getMediaType() == RongCallCommon.CallMediaType.VIDEO) {
                     LogUtils.i("onReceivedCall 收到视频通话");
+                    WindowHelper.getInstance().hideView(mFullVideoView);
                 }
             }
 
@@ -386,7 +437,11 @@ public class CloudService extends Service implements View.OnClickListener {
 
             @Override
             public void onRemoteUserJoined(String s, RongCallCommon.CallMediaType callMediaType, int i, SurfaceView surfaceView) {
-
+                // 被叫端加入通话 --子线程
+                // surfaceView -- 对方的相机信息
+                MessageEvent messageEvent = new MessageEvent(EventManager.FLAG_SEND_CAMERA_VIEW);
+                messageEvent.setSurfaceView(surfaceView);
+                EventManager.post(messageEvent);
             }
 
             @Override
@@ -452,19 +507,49 @@ public class CloudService extends Service implements View.OnClickListener {
     }
 
     /**
+     * 控制视频窗口的控件显示或者隐藏
+     * * @param info
+     * * @param small
+     *
+     * @param answer
+     * @param hangup
+     * @param time
+     */
+    private void goneVideoView(boolean info, boolean small,
+                               boolean big, boolean answer, boolean hangup,
+                               boolean time) {
+        // 个人信息 小窗口  接听  挂断 时间
+        video_ll_info.setVisibility(info ? View.VISIBLE : View.GONE);
+        video_small_video.setVisibility(small ? View.VISIBLE : View.GONE);
+        video_big_video.setVisibility(big ? View.VISIBLE : View.GONE);
+        video_ll_answer.setVisibility(answer ? View.VISIBLE : View.GONE);
+        video_ll_hangup.setVisibility(hangup ? View.VISIBLE : View.GONE);
+        video_tv_time.setVisibility(time ? View.VISIBLE : View.GONE);
+    }
+
+    /**
      * 更新窗口UI信息
      *
-     * @param index 0:接收 1 拨打
+     * @param index     0:接收 1 拨打
+     * @param mediaType
      * @param id
      */
-    private void updateWindowInfo(int index, String id) {
+    private void updateWindowInfo(int index, RongCallCommon.CallMediaType mediaType, String id) {
 
-        if (index == 0) {
-            goneAudioView(false, true, true, false, false);
-            mAudioPlayManager.startPlay(CloudManager.callAudioPath);
-        } else {
-            goneAudioView(false, false, true, false, false);
+        if (mediaType == RongCallCommon.CallMediaType.AUDIO) {
+            if (index == 0) {
+                goneAudioView(false, true, true, false, false);
+            } else {
+                goneAudioView(false, false, true, false, false);
+            }
+        } else if (mediaType == RongCallCommon.CallMediaType.VIDEO) {
+            if (index == 0) {
+                goneVideoView(true, false, false, true, true, false);
+            } else {
+                goneVideoView(true, false, true, false, true, false);
+            }
         }
+
 
         BmobManager.getInstance().queryObjectIdUser(id, new FindListener<IMUser>() {
             @Override
@@ -472,12 +557,22 @@ public class CloudService extends Service implements View.OnClickListener {
                 if (e == null) {
                     if (list != null && list.size() > 0) {
                         IMUser imUser = list.get(0);
-                        GlideHelper.loadUrl(CloudService.this, imUser.getPhoto(), audio_iv_photo);
-                        if (index == 0) {
-                            audio_tv_status.setText(imUser.getNickName() + "来电了...");
-                        } else {
-                            audio_tv_status.setText("正在呼叫" + imUser.getNickName() + "...");
+                        if (mediaType == RongCallCommon.CallMediaType.AUDIO) { // 语音
+                            GlideHelper.loadUrl(CloudService.this, imUser.getPhoto(), audio_iv_photo);
+                            if (index == 0) {
+                                audio_tv_status.setText(imUser.getNickName() + "来电了...");
+                            } else {
+                                audio_tv_status.setText("正在呼叫" + imUser.getNickName() + "...");
+                            }
+                        } else if (mediaType == RongCallCommon.CallMediaType.VIDEO) { // 视频
+                            GlideHelper.loadUrl(CloudService.this, imUser.getPhoto(), video_iv_photo);
+                            if (index == 0) {
+                                video_tv_name.setText(imUser.getNickName() + "视频来电了...");
+                            } else {
+                                video_tv_name.setText("正在视频呼叫" + imUser.getNickName() + "...");
+                            }
                         }
+
                     }
                 }
             }
@@ -504,10 +599,12 @@ public class CloudService extends Service implements View.OnClickListener {
                 }
                 break;
             case R.id.audio_ll_answer:
+            case R.id.video_ll_answer:
                 // 接听
                 CloudManager.getInstance().acceptCall(mCallId);
                 break;
             case R.id.audio_ll_hangup:
+            case R.id.video_ll_hangup:
                 // 挂断
                 CloudManager.getInstance().hangUpCall(mCallId);
                 break;
@@ -520,7 +617,53 @@ public class CloudService extends Service implements View.OnClickListener {
             case R.id.audio_iv_small:
                 // 缩小窗口
                 break;
+            case R.id.video_small_video:
+                // 视频缩小窗口
+                mIsSmallShowLocal = !mIsSmallShowLocal;
+                updateVideoView();
+                break;
+
         }
 
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        switch (event.getType()) {
+            case EventManager.FLAG_SEND_CAMERA_VIEW:
+                SurfaceView surfaceView = event.getSurfaceView();
+                if (surfaceView != null) {
+                    mRemoteView = surfaceView;
+                }
+                updateVideoView();
+                break;
+        }
+    }
+
+    /**
+     * 更新视频流
+     */
+    private void updateVideoView() {
+        video_big_video.removeAllViews();
+        video_small_video.removeAllViews();
+        if (mIsSmallShowLocal) {
+            if (mLocalView != null) {
+                video_small_video.addView(mLocalView);
+                mLocalView.setZOrderOnTop(true);
+            }
+            if (mRemoteView != null) {
+                video_big_video.addView(mRemoteView);
+                mRemoteView.setZOrderOnTop(false);
+            }
+        } else {
+            if (mRemoteView != null) {
+                video_small_video.addView(mRemoteView);
+                mRemoteView.setZOrderOnTop(true);
+            }
+            if (mLocalView != null) {
+                video_big_video.addView(mLocalView);
+                mLocalView.setZOrderOnTop(false);
+            }
+        }
     }
 }

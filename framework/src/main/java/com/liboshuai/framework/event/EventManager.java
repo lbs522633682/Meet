@@ -20,6 +20,9 @@ public class EventManager {
 
     // 发送位置消息
     public static final int FLAG_SEND_LOCATION = 1003;
+
+    // 发送相机信息
+    public static final int FLAG_SEND_CAMERA_VIEW = 1004;
     /**
      * Event 的步骤
      * 1. 注册

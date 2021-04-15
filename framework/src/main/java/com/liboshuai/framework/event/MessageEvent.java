@@ -1,5 +1,7 @@
 package com.liboshuai.framework.event;
 
+import android.view.SurfaceView;
+
 import com.liboshuai.framework.utils.JsonUtil;
 
 /**
@@ -26,6 +28,17 @@ public class MessageEvent {
     private double la;
     private double lo;
     private String address;
+
+    // 相机消息
+    private SurfaceView surfaceView;
+
+    public SurfaceView getSurfaceView() {
+        return surfaceView;
+    }
+
+    public void setSurfaceView(SurfaceView surfaceView) {
+        this.surfaceView = surfaceView;
+    }
 
     public double getLa() {
         return la;
